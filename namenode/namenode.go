@@ -42,16 +42,17 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 		for {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
-			resp, err := clientDatanode.RegistrarJugada(ctx, &pb.RegistrarJugadaReq{NumJugador: in.NumJugador})
+			resp, err := clientDatanode.ObtenerJugadas(ctx, &pb.ObtenerJugadasReq{NumJugador: in.NumJugador})
 			if err != nil {
 				time.Sleep(500 * time.Millisecond)
 			} else {
-				msg = msg + resp.Jugada
+				msg = msg + resp.Msg
 				break
 			}
 		}
 		connData.Close()
 	}
+	return &pb.DevolverJugadasJugResp{Msg: msg}, nil
 }
 
 func WriteText(ip string, ronda int32, numJugador int32) {
