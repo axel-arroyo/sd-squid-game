@@ -1,4 +1,4 @@
-module squid_game
+module github.com/axel-arroyo/sd-squid-game
 
 go 1.17
 

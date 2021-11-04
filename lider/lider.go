@@ -9,10 +9,11 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	pb "squid_game/gen/proto"
 	"strconv"
 	"sync"
 	"sync/atomic"
+
+	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
 
 	"google.golang.org/grpc"
 )

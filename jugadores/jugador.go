@@ -6,9 +6,10 @@ import (
 	"io"
 	"log"
 	"math/rand"
-	pb "squid_game/gen/proto"
 	"sync"
 	"time"
+
+	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
 
 	"google.golang.org/grpc"
 )

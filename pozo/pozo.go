@@ -6,9 +6,10 @@ import (
 	"log"
 	"net"
 	"os"
-	pb "squid_game/gen/proto"
 	"strconv"
 	"strings"
+
+	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
 
 	"google.golang.org/grpc"
 )
