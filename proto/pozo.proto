@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "./proto";
+
+service Pozo{
+	// Envía el monto total acumulado
+	rpc Amount(AmountReq) returns (AmountResp);
+}
+
+message AmountReq{}
+
+message AmountResp{
+  	int32 valor = 1;
+}

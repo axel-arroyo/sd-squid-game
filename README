@@ -1,0 +1,16 @@
+GRPC
+Pozo escucha en puerto 50051 al Lider
+
+Lider escucha en puerto xxxx a los Jugadores
+Lider escucha en puerto yyyy al Namenode
+Lider escucha en puerto zzzz al Pozo
+
+Namenode escucha en puerto xxxx al Lider
+Namenode escucha en puerto yyyy a los Datanodes
+
+Datanode escucha en puerto xxxx al Namenode
+
+
+Cliente llame a unirse a juego -> Server manda varios mensajes
+if msg == "EL juego a iniciado"
+

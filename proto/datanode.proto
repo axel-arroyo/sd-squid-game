@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "./proto";
+
+service DataNode{
+	// Registra las jugadas de un jugador
+	rpc RegistrarJugadaJug (RegistrarJugadaJugReq) returns (RegistrarJugadaJugResp);
+	// Devuelve las jugadas de un jugador
+}
+
+message RegistrarJugadaJugReq{
+	int32 numJugador = 1;
+	int32 ronda = 2;
+	string jugada = 3;
+}
+
+message RegistrarJugadaJugResp{
+	string msg = 1;
+}

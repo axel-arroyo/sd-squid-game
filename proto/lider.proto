@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "./proto";
+
+service Lider{
+	// Petición de unirse al juego 
+	rpc UnirseAJuego(UnirseReq) returns (stream UnirseResp);
+	// Recibe jugada de un jugador
+	rpc EnviarJugada (EnviarJugadaReq) returns (EnviarJugadaResp);
+	// Recibe el estado de los jugadores después de que haya finalizado una etapa
+	rpc EnviarEstado (EnviarEstadoReq) returns (EnviarEstadoResp);
+	//	Recibe la petición de ver el pozo por parte del jugador
+	rpc PedirPozo (PedirPozoReq) returns (PedirPozoResp);
+}
+
+message PedirPozoReq{
+}
+
+message PedirPozoResp{
+	int32 valor = 1;
+}
+
+message EnviarEstadoReq{
+	int32 numJugador = 1;
+	bool estado = 2;
+	int32 etapa = 3;
+}
+
+message EnviarEstadoResp{
+	string msg = 1;
+}
+
+message UnirseReq{
+	int32 numJugador = 1;
+	string msg = 2;
+}
+
+message UnirseResp{
+	string msg = 1;
+}
+
+message EnviarJugadaReq{
+	int32 numJugador = 1;
+	int32 etapa = 2;
+	int32 ronda = 3;
+	int32 jugada = 4;
+}
+
+message EnviarJugadaResp{
+	string msg = 1;
+	bool eliminado = 2;
+}
+
