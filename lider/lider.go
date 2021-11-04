@@ -385,7 +385,7 @@ func (s *liderServer) EnviarEstado(ctx context.Context, req *pb.EnviarEstadoReq)
 
 func (s *liderServer) PedirPozo(ctx context.Context, req *pb.PedirPozoReq) (*pb.PedirPozoResp, error) {
 	// Conectar al Pozo
-	connPozo, err := grpc.Dial("localhost"+portPozo, grpc.WithInsecure())
+	connPozo, err := grpc.Dial(ipPozo+portPozo, grpc.WithInsecure())
 	if err != nil {
 		log.Println(err)
 	}
