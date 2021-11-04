@@ -5,6 +5,9 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
+	"strconv"
+	"sync"
 	"time"
 
 	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
@@ -22,6 +25,7 @@ const (
 
 var (
 	ipDatanodes = [3]string{"localhost", "localhost", "localhost"}
+	mutex       sync.Mutex
 )
 
 func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.DevolverJugadasJugReq) (*pb.DevolverJugadasJugResp, error) {
@@ -38,7 +42,7 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 		for {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
-			resp, err := clientDatanode.DevolverJugadasJug(ctx, &pb.DevolverJugadasJugReq{NumJugador: in.NumJugador})
+			resp, err := clientDatanode.RegistrarJugada(ctx, &pb.RegistrarJugadaReq{NumJugador: in.NumJugador})
 			if err != nil {
 				time.Sleep(500 * time.Millisecond)
 			} else {
@@ -48,6 +52,17 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 		}
 		connData.Close()
 	}
+}
+
+func WriteText(ip string, ronda int32, numJugador int32) {
+	mutex.Lock()
+	// Escribir la ip del datanode con la informacion de la jugada en archivo de texto
+	textFile, _ := os.Open("info.txt")
+	_, err := textFile.WriteString("Jugador_" + strconv.Itoa(int(numJugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + ip + "\n")
+	if err != nil {
+		log.Fatalf("Error al escribir en el archivo: %v", err)
+	}
+	mutex.Unlock()
 }
 
 func (s *namenodeServer) RegistrarJugada(ctx context.Context, in *pb.RegistrarJugadaReq) (*pb.RegistrarJugadaResp, error) {
@@ -70,6 +85,8 @@ func (s *namenodeServer) RegistrarJugada(ctx context.Context, in *pb.RegistrarJu
 			break
 		}
 	}
+	// Almacenar la ip del datanode con la informacion de la jugada en archivo de texto
+	go WriteText(ipDatanode, in.Ronda, in.NumJugador)
 	connData.Close()
 	return &pb.RegistrarJugadaResp{}, nil
 }

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"os"
+	"path/filepath"
+	"strconv"
 
 	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
 	"google.golang.org/grpc"
@@ -17,12 +20,62 @@ const (
 	portServer = ":50054"
 )
 
-func writePlay(jugador int32, etapa int32) {
-	var textFile os.File
-	textFile.WriteString("")
+// https://stackoverflow.com/questions/55300117/how-do-i-find-all-files-that-have-a-certain-extension-in-go-regardless-of-depth
+func playerFiles(player int32) []string {
+	var matches []string
+	var pattern = "jugador_" + strconv.Itoa(int(player)) + "*.txt"
+	err := filepath.Walk("/plays/,", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if matched, err := filepath.Match(pattern, filepath.Base(path)); err != nil {
+			return err
+		} else if matched {
+			matches = append(matches, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil
+	}
+	return matches
+}
+
+func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugadasReq) (*pb.ObtenerJugadasResp, error) {
+	var jugadasPath = playerFiles(in.NumJugador)
+	var msg string
+	for _, jugadaPath := range jugadasPath {
+		jugadaFile, err := os.Open(jugadaPath)
+		if err != nil {
+			return nil, err
+		}
+		// Leer el archivo y devolverlo
+		dat, err := os.ReadFile(jugadaPath)
+		if err != nil {
+			return nil, err
+		}
+		jugadaFile.Close()
+		msg += string(dat)
+	}
+	return &pb.ObtenerJugadasResp{Msg: msg}, nil
+}
+
+func writePlay(jugador int32, ronda int32, jugada int32) {
+	textFile, _ := os.Create("/plays/jugador_" + strconv.Itoa(int(jugador)) + "__ronda_" + strconv.Itoa(int(ronda)) + ".txt")
+	textFile.WriteString(strconv.Itoa(int(jugada)))
+}
+
+func (s *datanodeServer) GuardarJugada(ctx context.Context, in *pb.GuardarJugadaReq) (*pb.GuardarJugadaResp, error) {
+	// Guardar jugada en otro proceso y retornar instantaneo
+	go writePlay(in.NumJugador, in.Ronda, in.Jugada)
+	return &pb.GuardarJugadaResp{}, nil
 }
 
 func main() {
+	// Escuchar al namenode
 	namenodeListener, err := net.Listen("tcp", portServer)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
