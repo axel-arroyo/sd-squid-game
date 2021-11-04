@@ -199,10 +199,10 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 		_, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 2})
 		if err != nil {
 			log.Println(err)
+			time.Sleep(2 * time.Second)
 		} else {
 			break
 		}
-		time.Sleep(1 * time.Second)
 	}
 
 	fmt.Println("El lider ha comenzado la siguiente etapa.")
@@ -278,11 +278,10 @@ func BotPlayer(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 		defer cancel()
 		_, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 2})
 		if err != nil {
-			fmt.Println(err)
+			time.Sleep(1 * time.Second)
 		} else {
 			break
 		}
-		time.Sleep(1 * time.Second)
 	}
 
 	// Todo o nada

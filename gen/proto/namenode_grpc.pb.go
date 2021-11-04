@@ -18,10 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NamenodeClient interface {
-	// Asigna un jugador a un Datanode (dentro del .go?)
-	// rpc AsignarMaquina(AsignarMaqReq) returns (AsignarMaqResp);
 	// Llama al datanode para registrar la jugada
-	RegistrarJugada(ctx context.Context, in *RegistrarJugReq, opts ...grpc.CallOption) (*RegistrarJugResp, error)
+	RegistrarJugada(ctx context.Context, in *RegistrarJugadaReq, opts ...grpc.CallOption) (*RegistrarJugadaResp, error)
 	DevolverJugadasJug(ctx context.Context, in *DevolverJugadasJugReq, opts ...grpc.CallOption) (*DevolverJugadasJugResp, error)
 }
 
@@ -33,8 +31,8 @@ func NewNamenodeClient(cc grpc.ClientConnInterface) NamenodeClient {
 	return &namenodeClient{cc}
 }
 
-func (c *namenodeClient) RegistrarJugada(ctx context.Context, in *RegistrarJugReq, opts ...grpc.CallOption) (*RegistrarJugResp, error) {
-	out := new(RegistrarJugResp)
+func (c *namenodeClient) RegistrarJugada(ctx context.Context, in *RegistrarJugadaReq, opts ...grpc.CallOption) (*RegistrarJugadaResp, error) {
+	out := new(RegistrarJugadaResp)
 	err := c.cc.Invoke(ctx, "/grpc.Namenode/RegistrarJugada", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -55,10 +53,8 @@ func (c *namenodeClient) DevolverJugadasJug(ctx context.Context, in *DevolverJug
 // All implementations must embed UnimplementedNamenodeServer
 // for forward compatibility
 type NamenodeServer interface {
-	// Asigna un jugador a un Datanode (dentro del .go?)
-	// rpc AsignarMaquina(AsignarMaqReq) returns (AsignarMaqResp);
 	// Llama al datanode para registrar la jugada
-	RegistrarJugada(context.Context, *RegistrarJugReq) (*RegistrarJugResp, error)
+	RegistrarJugada(context.Context, *RegistrarJugadaReq) (*RegistrarJugadaResp, error)
 	DevolverJugadasJug(context.Context, *DevolverJugadasJugReq) (*DevolverJugadasJugResp, error)
 	mustEmbedUnimplementedNamenodeServer()
 }
@@ -67,7 +63,7 @@ type NamenodeServer interface {
 type UnimplementedNamenodeServer struct {
 }
 
-func (UnimplementedNamenodeServer) RegistrarJugada(context.Context, *RegistrarJugReq) (*RegistrarJugResp, error) {
+func (UnimplementedNamenodeServer) RegistrarJugada(context.Context, *RegistrarJugadaReq) (*RegistrarJugadaResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegistrarJugada not implemented")
 }
 func (UnimplementedNamenodeServer) DevolverJugadasJug(context.Context, *DevolverJugadasJugReq) (*DevolverJugadasJugResp, error) {
@@ -87,7 +83,7 @@ func RegisterNamenodeServer(s grpc.ServiceRegistrar, srv NamenodeServer) {
 }
 
 func _Namenode_RegistrarJugada_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegistrarJugReq)
+	in := new(RegistrarJugadaReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -99,7 +95,7 @@ func _Namenode_RegistrarJugada_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/grpc.Namenode/RegistrarJugada",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NamenodeServer).RegistrarJugada(ctx, req.(*RegistrarJugReq))
+		return srv.(NamenodeServer).RegistrarJugada(ctx, req.(*RegistrarJugadaReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }

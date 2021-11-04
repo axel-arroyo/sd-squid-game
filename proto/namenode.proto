@@ -5,21 +5,18 @@ package grpc;
 option go_package = "./proto";
 
 service Namenode{
-	// Asigna un jugador a un Datanode (dentro del .go?)
-	// rpc AsignarMaquina(AsignarMaqReq) returns (AsignarMaqResp);
 	// Llama al datanode para registrar la jugada
-	rpc RegistrarJugada(RegistrarJugReq) returns (RegistrarJugResp);
+	rpc RegistrarJugada(RegistrarJugadaReq) returns (RegistrarJugadaResp);
 	rpc DevolverJugadasJug(DevolverJugadasJugReq) returns (DevolverJugadasJugResp);
 }
 
-message RegistrarJugReq{
-	string ipDataNode = 1;
+message RegistrarJugadaReq{
 	int32 numJugador = 2;
 	int32 ronda = 3;
-	string jugada = 4;
+	int32 jugada = 4;
 }
 
-message RegistrarJugResp{
+message RegistrarJugadaResp{
 	string msg = 1;
 }
 

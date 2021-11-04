@@ -20,18 +20,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type RegistrarJugadaJugReq struct {
+type GuardarJugadaReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	NumJugador int32  `protobuf:"varint,1,opt,name=numJugador,proto3" json:"numJugador,omitempty"`
-	Ronda      int32  `protobuf:"varint,2,opt,name=ronda,proto3" json:"ronda,omitempty"`
-	Jugada     string `protobuf:"bytes,3,opt,name=jugada,proto3" json:"jugada,omitempty"`
+	NumJugador int32 `protobuf:"varint,1,opt,name=numJugador,proto3" json:"numJugador,omitempty"`
+	Ronda      int32 `protobuf:"varint,2,opt,name=ronda,proto3" json:"ronda,omitempty"`
+	Jugada     int32 `protobuf:"varint,3,opt,name=jugada,proto3" json:"jugada,omitempty"`
 }
 
-func (x *RegistrarJugadaJugReq) Reset() {
-	*x = RegistrarJugadaJugReq{}
+func (x *GuardarJugadaReq) Reset() {
+	*x = GuardarJugadaReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_datanode_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -39,13 +39,13 @@ func (x *RegistrarJugadaJugReq) Reset() {
 	}
 }
 
-func (x *RegistrarJugadaJugReq) String() string {
+func (x *GuardarJugadaReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegistrarJugadaJugReq) ProtoMessage() {}
+func (*GuardarJugadaReq) ProtoMessage() {}
 
-func (x *RegistrarJugadaJugReq) ProtoReflect() protoreflect.Message {
+func (x *GuardarJugadaReq) ProtoReflect() protoreflect.Message {
 	mi := &file_datanode_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -57,33 +57,33 @@ func (x *RegistrarJugadaJugReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegistrarJugadaJugReq.ProtoReflect.Descriptor instead.
-func (*RegistrarJugadaJugReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GuardarJugadaReq.ProtoReflect.Descriptor instead.
+func (*GuardarJugadaReq) Descriptor() ([]byte, []int) {
 	return file_datanode_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RegistrarJugadaJugReq) GetNumJugador() int32 {
+func (x *GuardarJugadaReq) GetNumJugador() int32 {
 	if x != nil {
 		return x.NumJugador
 	}
 	return 0
 }
 
-func (x *RegistrarJugadaJugReq) GetRonda() int32 {
+func (x *GuardarJugadaReq) GetRonda() int32 {
 	if x != nil {
 		return x.Ronda
 	}
 	return 0
 }
 
-func (x *RegistrarJugadaJugReq) GetJugada() string {
+func (x *GuardarJugadaReq) GetJugada() int32 {
 	if x != nil {
 		return x.Jugada
 	}
-	return ""
+	return 0
 }
 
-type RegistrarJugadaJugResp struct {
+type GuardarJugadaResp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -91,8 +91,8 @@ type RegistrarJugadaJugResp struct {
 	Msg string `protobuf:"bytes,1,opt,name=msg,proto3" json:"msg,omitempty"`
 }
 
-func (x *RegistrarJugadaJugResp) Reset() {
-	*x = RegistrarJugadaJugResp{}
+func (x *GuardarJugadaResp) Reset() {
+	*x = GuardarJugadaResp{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_datanode_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,13 +100,13 @@ func (x *RegistrarJugadaJugResp) Reset() {
 	}
 }
 
-func (x *RegistrarJugadaJugResp) String() string {
+func (x *GuardarJugadaResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegistrarJugadaJugResp) ProtoMessage() {}
+func (*GuardarJugadaResp) ProtoMessage() {}
 
-func (x *RegistrarJugadaJugResp) ProtoReflect() protoreflect.Message {
+func (x *GuardarJugadaResp) ProtoReflect() protoreflect.Message {
 	mi := &file_datanode_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -118,12 +118,106 @@ func (x *RegistrarJugadaJugResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegistrarJugadaJugResp.ProtoReflect.Descriptor instead.
-func (*RegistrarJugadaJugResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use GuardarJugadaResp.ProtoReflect.Descriptor instead.
+func (*GuardarJugadaResp) Descriptor() ([]byte, []int) {
 	return file_datanode_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RegistrarJugadaJugResp) GetMsg() string {
+func (x *GuardarJugadaResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+type ObtenerJugadasReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NumJugador int32 `protobuf:"varint,1,opt,name=numJugador,proto3" json:"numJugador,omitempty"`
+}
+
+func (x *ObtenerJugadasReq) Reset() {
+	*x = ObtenerJugadasReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_datanode_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ObtenerJugadasReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ObtenerJugadasReq) ProtoMessage() {}
+
+func (x *ObtenerJugadasReq) ProtoReflect() protoreflect.Message {
+	mi := &file_datanode_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ObtenerJugadasReq.ProtoReflect.Descriptor instead.
+func (*ObtenerJugadasReq) Descriptor() ([]byte, []int) {
+	return file_datanode_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ObtenerJugadasReq) GetNumJugador() int32 {
+	if x != nil {
+		return x.NumJugador
+	}
+	return 0
+}
+
+type ObtenerJugadasResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Msg string `protobuf:"bytes,1,opt,name=msg,proto3" json:"msg,omitempty"`
+}
+
+func (x *ObtenerJugadasResp) Reset() {
+	*x = ObtenerJugadasResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_datanode_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ObtenerJugadasResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ObtenerJugadasResp) ProtoMessage() {}
+
+func (x *ObtenerJugadasResp) ProtoReflect() protoreflect.Message {
+	mi := &file_datanode_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ObtenerJugadasResp.ProtoReflect.Descriptor instead.
+func (*ObtenerJugadasResp) Descriptor() ([]byte, []int) {
+	return file_datanode_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ObtenerJugadasResp) GetMsg() string {
 	if x != nil {
 		return x.Msg
 	}
@@ -134,23 +228,32 @@ var File_datanode_proto protoreflect.FileDescriptor
 
 var file_datanode_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x64, 0x61, 0x74, 0x61, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x12, 0x04, 0x67, 0x72, 0x70, 0x63, 0x22, 0x65, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x4a, 0x75, 0x67, 0x52, 0x65, 0x71, 0x12,
-	0x1e, 0x0a, 0x0a, 0x6e, 0x75, 0x6d, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x6f, 0x72, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x05, 0x52, 0x0a, 0x6e, 0x75, 0x6d, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x6f, 0x72, 0x12,
-	0x14, 0x0a, 0x05, 0x72, 0x6f, 0x6e, 0x64, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05,
-	0x72, 0x6f, 0x6e, 0x64, 0x61, 0x12, 0x16, 0x0a, 0x06, 0x6a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x22, 0x2a, 0x0a,
-	0x16, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61,
-	0x4a, 0x75, 0x67, 0x52, 0x65, 0x73, 0x70, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0x5b, 0x0a, 0x08, 0x44, 0x61, 0x74,
-	0x61, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x4f, 0x0a, 0x12, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72,
-	0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x4a, 0x75, 0x67, 0x12, 0x1b, 0x2e, 0x67, 0x72,
-	0x70, 0x63, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61,
-	0x64, 0x61, 0x4a, 0x75, 0x67, 0x52, 0x65, 0x71, 0x1a, 0x1c, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x2e,
-	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x4a,
-	0x75, 0x67, 0x52, 0x65, 0x73, 0x70, 0x42, 0x09, 0x5a, 0x07, 0x2e, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0x04, 0x67, 0x72, 0x70, 0x63, 0x22, 0x60, 0x0a, 0x10, 0x47, 0x75, 0x61, 0x72, 0x64, 0x61,
+	0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x52, 0x65, 0x71, 0x12, 0x1e, 0x0a, 0x0a, 0x6e, 0x75,
+	0x6d, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0a,
+	0x6e, 0x75, 0x6d, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x6f, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x72, 0x6f,
+	0x6e, 0x64, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x72, 0x6f, 0x6e, 0x64, 0x61,
+	0x12, 0x16, 0x0a, 0x06, 0x6a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05,
+	0x52, 0x06, 0x6a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x22, 0x25, 0x0a, 0x11, 0x47, 0x75, 0x61, 0x72,
+	0x64, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x10, 0x0a,
+	0x03, 0x6d, 0x73, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22,
+	0x33, 0x0a, 0x11, 0x4f, 0x62, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61,
+	0x73, 0x52, 0x65, 0x71, 0x12, 0x1e, 0x0a, 0x0a, 0x6e, 0x75, 0x6d, 0x4a, 0x75, 0x67, 0x61, 0x64,
+	0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0a, 0x6e, 0x75, 0x6d, 0x4a, 0x75, 0x67,
+	0x61, 0x64, 0x6f, 0x72, 0x22, 0x26, 0x0a, 0x12, 0x4f, 0x62, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x4a,
+	0x75, 0x67, 0x61, 0x64, 0x61, 0x73, 0x52, 0x65, 0x73, 0x70, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73,
+	0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0x91, 0x01, 0x0a,
+	0x08, 0x44, 0x61, 0x74, 0x61, 0x6e, 0x6f, 0x64, 0x65, 0x12, 0x40, 0x0a, 0x0d, 0x47, 0x75, 0x61,
+	0x72, 0x64, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x12, 0x16, 0x2e, 0x67, 0x72, 0x70,
+	0x63, 0x2e, 0x47, 0x75, 0x61, 0x72, 0x64, 0x61, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x52,
+	0x65, 0x71, 0x1a, 0x17, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x2e, 0x47, 0x75, 0x61, 0x72, 0x64, 0x61,
+	0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x43, 0x0a, 0x0e, 0x4f,
+	0x62, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x73, 0x12, 0x17, 0x2e,
+	0x67, 0x72, 0x70, 0x63, 0x2e, 0x4f, 0x62, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x4a, 0x75, 0x67, 0x61,
+	0x64, 0x61, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x18, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x2e, 0x4f, 0x62,
+	0x74, 0x65, 0x6e, 0x65, 0x72, 0x4a, 0x75, 0x67, 0x61, 0x64, 0x61, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x42, 0x09, 0x5a, 0x07, 0x2e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -165,16 +268,20 @@ func file_datanode_proto_rawDescGZIP() []byte {
 	return file_datanode_proto_rawDescData
 }
 
-var file_datanode_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_datanode_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_datanode_proto_goTypes = []interface{}{
-	(*RegistrarJugadaJugReq)(nil),  // 0: grpc.RegistrarJugadaJugReq
-	(*RegistrarJugadaJugResp)(nil), // 1: grpc.RegistrarJugadaJugResp
+	(*GuardarJugadaReq)(nil),   // 0: grpc.GuardarJugadaReq
+	(*GuardarJugadaResp)(nil),  // 1: grpc.GuardarJugadaResp
+	(*ObtenerJugadasReq)(nil),  // 2: grpc.ObtenerJugadasReq
+	(*ObtenerJugadasResp)(nil), // 3: grpc.ObtenerJugadasResp
 }
 var file_datanode_proto_depIdxs = []int32{
-	0, // 0: grpc.DataNode.RegistrarJugadaJug:input_type -> grpc.RegistrarJugadaJugReq
-	1, // 1: grpc.DataNode.RegistrarJugadaJug:output_type -> grpc.RegistrarJugadaJugResp
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: grpc.Datanode.GuardarJugada:input_type -> grpc.GuardarJugadaReq
+	2, // 1: grpc.Datanode.ObtenerJugadas:input_type -> grpc.ObtenerJugadasReq
+	1, // 2: grpc.Datanode.GuardarJugada:output_type -> grpc.GuardarJugadaResp
+	3, // 3: grpc.Datanode.ObtenerJugadas:output_type -> grpc.ObtenerJugadasResp
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -187,7 +294,7 @@ func file_datanode_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_datanode_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegistrarJugadaJugReq); i {
+			switch v := v.(*GuardarJugadaReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -199,7 +306,31 @@ func file_datanode_proto_init() {
 			}
 		}
 		file_datanode_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegistrarJugadaJugResp); i {
+			switch v := v.(*GuardarJugadaResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_datanode_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ObtenerJugadasReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_datanode_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ObtenerJugadasResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -217,7 +348,7 @@ func file_datanode_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_datanode_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -12,10 +12,19 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
 
 	"google.golang.org/grpc"
+)
+
+const (
+	ipNamenode   = "localhost"
+	portNamenode = "50057"
+	ipPozo       = "localhost"
+	portPozo     = ":50051"
+	portServer   = ":50052"
 )
 
 // Variables Globales
@@ -202,7 +211,6 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 		// Empate de los dos equipos, revisar si uno es igual al del lider, si es así, ambos pasan, si no, se elimina un equipo al azar
 		if paridadEquipo1 == paridadLider {
 			// Ganaron, ambos pasan
-			estadoFinalEtapa2[numJugador-1] = 2
 			return &pb.EnviarJugadaResp{Eliminado: false, Msg: "Ambos equipos pasan"}
 		}
 		// Ambos perdieron, eliminar uno al azar
@@ -211,7 +219,6 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			if jugadorEnEquipo(numJugador, equipo1) {
 				// El jugador pertenece al equipo 1, eliminarlo
 				EliminarJugador(numJugador)
-				estadoFinalEtapa2[numJugador-1] = 1
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
 			} else {
 				// El jugador es del equipo 2, no eliminarlo
@@ -222,11 +229,9 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			// Eliminar equipo 2
 			if jugadorEnEquipo(numJugador, equipo2) {
 				EliminarJugador(numJugador)
-				estadoFinalEtapa2[numJugador-1] = 1
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
 			} else {
 				// El jugador es del equipo 1, no eliminarlo
-				estadoFinalEtapa2[numJugador-1] = 2
 				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
 			}
 		}
@@ -238,26 +243,41 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			if jugadorEnEquipo(numJugador, equipo2) {
 				// El jugador pertenece al equipo 2, eliminarlo
 				EliminarJugador(numJugador)
-				estadoFinalEtapa2[numJugador-1] = 1
-				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(numTirarCuerda))}
+				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
 			} else {
 				// El jugador pertenece al equipo 1, no eliminarlo
-				estadoFinalEtapa2[numJugador-1] = 2
-				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(numTirarCuerda))}
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
 			}
 		} else {
 			// Eliminar equipo 1
 			if jugadorEnEquipo(numJugador, equipo1) {
 				// El jugador pertenece al equipo 1, eliminarlo
 				EliminarJugador(numJugador)
-				estadoFinalEtapa2[numJugador-1] = 1
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
 			} else {
-				estadoFinalEtapa2[numJugador-1] = 2
 				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
 			}
 		}
 	}
+}
+
+func RegistrarJugada(jugada int32, numJugador int32, ronda int32) {
+	// Conectar al Namenode
+	connNamenode, err := grpc.Dial(ipNamenode+portNamenode, grpc.WithInsecure())
+	if err != nil {
+		log.Println(err)
+	}
+	clientNamenode := pb.NewNamenodeClient(connNamenode)
+	// Hacer request al namenode hasta que la almacene
+	for {
+		_, err = clientNamenode.RegistrarJugada(context.Background(), &pb.RegistrarJugadaReq{Jugada: jugada, NumJugador: numJugador, Ronda: ronda})
+		if err != nil {
+			break
+		} else {
+			time.Sleep(time.Second * 2)
+		}
+	}
+	connNamenode.Close()
 }
 
 func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq) (*pb.EnviarJugadaResp, error) {
@@ -265,8 +285,9 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 	case 1:
 		menuAlreadyPrinted = false
 		// LuzVerdeLuzRoja
-		// log.Println("El jugador " + strconv.Itoa(int(req.NumJugador)) + " ha ingresado " + strconv.Itoa(int(req.Jugada)))
 		numLuzVerdeLuzRoja := numLuzVerde[req.Ronda-1]
+		// Registrar jugada en namenode
+		// RegistrarJugada()
 		eliminado := req.Jugada >= int32(numLuzVerdeLuzRoja)
 		if eliminado {
 			EliminarJugador(req.NumJugador)
@@ -377,12 +398,6 @@ func (s *liderServer) PedirPozo(ctx context.Context, req *pb.PedirPozoReq) (*pb.
 	// Mandar respuesta al jugador
 	return &pb.PedirPozoResp{Valor: respPozo.Valor}, nil
 }
-
-const (
-	portPozo    = ":50051"
-	portServer  = ":50052"
-	portJugador = ":50053"
-)
 
 func main() {
 	// Escuchar al Jugador

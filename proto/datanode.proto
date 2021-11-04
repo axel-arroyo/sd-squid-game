@@ -4,18 +4,27 @@ package grpc;
 
 option go_package = "./proto";
 
-service DataNode{
+service Datanode{
 	// Registra las jugadas de un jugador
-	rpc RegistrarJugadaJug (RegistrarJugadaJugReq) returns (RegistrarJugadaJugResp);
+	rpc GuardarJugada (GuardarJugadaReq) returns (GuardarJugadaResp);
 	// Devuelve las jugadas de un jugador
+	rpc ObtenerJugadas (ObtenerJugadasReq) returns (ObtenerJugadasResp);
 }
 
-message RegistrarJugadaJugReq{
+message GuardarJugadaReq{
 	int32 numJugador = 1;
 	int32 ronda = 2;
-	string jugada = 3;
+	int32 jugada = 3;
 }
 
-message RegistrarJugadaJugResp{
+message GuardarJugadaResp{
+	string msg = 1;
+}
+
+message ObtenerJugadasReq{
+	int32 numJugador = 1;
+}
+
+message ObtenerJugadasResp{
 	string msg = 1;
 }
