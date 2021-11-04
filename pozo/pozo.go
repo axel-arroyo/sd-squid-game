@@ -17,8 +17,6 @@ import (
 const (
 	// Puerto en que escucha al Lider
 	portServer = ":50051"
-	// Puero en que el Lider escucha al Pozo
-	portClient = "x"
 )
 
 type pozoServer struct {

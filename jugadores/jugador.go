@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	ipLider = "10.6.43.78"
 	// Puerto del lider a donde enviar solicitudes
 	portLider = ":50052"
 )
@@ -292,7 +293,7 @@ func BotPlayer(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 
 func main() {
 	// Conectar al Lider
-	connLider, err := grpc.Dial("localhost"+portLider, grpc.WithInsecure())
+	connLider, err := grpc.Dial(ipLider+portLider, grpc.WithInsecure())
 	if err != nil {
 		log.Println(err)
 	}
@@ -320,37 +321,4 @@ func main() {
 	go BotPlayer(clientLider, &wg, 16)
 
 	wg.Wait()
-
-	// El jugador ingresó al juego correctamente
-	// respRegistro
-	// msg = Mensaje success
-	// etapa = etapa del juego (debiese ser 1)
-	// ronda = ronda del juego (debiese ser 1)
-	// instrucciones
-
-	// Mostrar menú para la primera etapa al jugador
-	// Se muestra el mensaje de bienvenida al juego y las instrucciones de la primera etapa
-	// fmt.Println(respRegistro.Msg)
-	// fmt.Println(respRegistro.Instrucciones)
-	// // Reader para la opción
-	// switch respRegistro.Etapa {
-	// case 1:
-	// 	// LuzVerdeLuzRoja
-	// 	for ronda := 1; ronda <= 4; ronda++ {
-	// 		LuzVerdeLuzRoja(int32(ronda), clientLider)
-	// 	}
-	// 	break
-	// case 2:
-	// 	// TirarLaCuerda
-	// 	break
-	// case 3:
-	// 	// Todo o nada
-	// case 4:
-	// 	// Eliminado
-	// case 5:
-	// 	// Ganador
-	// default:
-	// 	// Error
-	// 	break
-	// }
 }

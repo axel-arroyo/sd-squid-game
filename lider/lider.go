@@ -20,9 +20,9 @@ import (
 )
 
 const (
-	ipNamenode   = "localhost"
-	portNamenode = "50057"
-	ipPozo       = "localhost"
+	ipNamenode   = "10.6.43.79"
+	portNamenode = ":50057"
+	ipPozo       = "10.6.43.77"
 	portPozo     = ":50051"
 	portServer   = ":50052"
 )

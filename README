@@ -1,16 +1,11 @@
 GRPC
-Pozo escucha en puerto 50051 al Lider
 
-Lider escucha en puerto xxxx a los Jugadores
-Lider escucha en puerto yyyy al Namenode
-Lider escucha en puerto zzzz al Pozo
+Pozo -> dist197 -> 10.6.43.77:50051
 
-Namenode escucha en puerto xxxx al Lider
-Namenode escucha en puerto yyyy a los Datanodes
+Lider -> dist198 -> 10.6.43.78:50052
 
-Datanode escucha en puerto xxxx al Namenode
+Namenode -> dist199 -> 10.6.43.79:50057
 
-
-Cliente llame a unirse a juego -> Server manda varios mensajes
-if msg == "EL juego a iniciado"
-
+Datanode1 -> dist200 -> 10.6.43.80:50054
+Datanode2 -> dist197 -> 10.6.43.77:50054
+Datanode3 -> dist198 -> 10.6.43.78:50054
