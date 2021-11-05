@@ -53,7 +53,9 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 				if err != nil {
 					time.Sleep(500 * time.Millisecond)
 				} else {
+					log.Printf("El datanode %s ha retornado al jugador %d -> %s\n", ipDatanode, in.NumJugador, resp.Msg)
 					msg += resp.Msg
+					log.Printf("Nuevo mensaje es %s \n", msg)
 					break
 				}
 			}
