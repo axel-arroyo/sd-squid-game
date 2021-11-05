@@ -23,6 +23,7 @@ message GuardarJugadaResp{
 
 message ObtenerJugadasReq{
 	int32 numJugador = 1;
+	int32 ronda = 2;
 }
 
 message ObtenerJugadasResp{

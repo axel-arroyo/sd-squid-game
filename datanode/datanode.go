@@ -46,15 +46,13 @@ func playerFiles(player int32) []string {
 }
 
 func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugadasReq) (*pb.ObtenerJugadasResp, error) {
-	var jugadasPath = playerFiles(in.NumJugador)
+	// var jugadasPath = playerFiles(in.NumJugador)
 	var msg string
-	for _, jugadaPath := range jugadasPath {
-		// Leer el archivo y devolverlo
-		dat, err := ioutil.ReadFile(jugadaPath)
-		if err != nil {
-			return nil, err
-		}
-		msg += string(dat)
+	dat, err := ioutil.ReadFile("/home/alumno/sd-squid-game/datanode/plays/jugador_" + strconv.Itoa(int(in.NumJugador)) + "__ronda_" + strconv.Itoa(int(in.Ronda)) + ".txt")
+	if err != nil {
+		msg = "No hay jugadas para el jugador " + strconv.Itoa(int(in.NumJugador)) + " en la ronda " + strconv.Itoa(int(in.Ronda))
+	} else {
+		msg = string(dat)
 	}
 	return &pb.ObtenerJugadasResp{Msg: msg}, nil
 }

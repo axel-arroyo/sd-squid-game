@@ -40,6 +40,8 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 		if strings.Contains(line, "Jugador_"+strconv.Itoa(int(in.NumJugador))) {
 			// Hacer request al datanode para devolver la jugada
 			ipDatanode := strings.Split(line, " ")[2]
+			// Ver que ronda tiene el archivo de texto
+			ronda, _ := strconv.Atoi(strings.Split(line, " ")[1])
 			connData, err := grpc.Dial(ipDatanode+portDatanode, grpc.WithInsecure())
 			if err != nil {
 				log.Fatalf("No se pudo conectar con el datanode: %v", err)
@@ -49,13 +51,13 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 				// Enviar request al datanode hasta que haya respuesta
 				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 				defer cancel()
-				resp, err := clientDatanode.ObtenerJugadas(ctx, &pb.ObtenerJugadasReq{NumJugador: in.NumJugador})
+				resp, err := clientDatanode.ObtenerJugadas(ctx, &pb.ObtenerJugadasReq{NumJugador: in.NumJugador, Ronda: int32(ronda)})
 				if err != nil {
 					time.Sleep(500 * time.Millisecond)
 				} else {
-					log.Printf("El datanode %s ha retornado al jugador %d -> %s\n", ipDatanode, in.NumJugador, resp.Msg)
+					// log.Printf("El datanode %s ha retornado al jugador %d -> %s\n", ipDatanode, in.NumJugador, resp.Msg)
 					msg += resp.Msg
-					log.Printf("Nuevo mensaje es %s \n", msg)
+					// log.Printf("Nuevo mensaje es %s \n", msg)
 					break
 				}
 			}
