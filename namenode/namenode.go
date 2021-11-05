@@ -46,7 +46,8 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 			}
 			clientDatanode := pb.NewDatanodeClient(connData)
 			for {
-				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+				// Enviar request al datanode hasta que haya respuesta
+				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 				defer cancel()
 				resp, err := clientDatanode.ObtenerJugadas(ctx, &pb.ObtenerJugadasReq{NumJugador: in.NumJugador})
 				if err != nil {

@@ -429,6 +429,7 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 			atomic.AddInt32(&jugadoresListosCuerda, 1)
 		}
 		atomic.StoreInt32(&jugadaRecibida[req.NumJugador-1], 1)
+		RegistrarJugada(req.Jugada, req.NumJugador, req.Ronda)
 		return nil, errors.New("jugada recibida")
 
 	case 3:
@@ -455,6 +456,7 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 				// El jugador pertenece a la pareja
 				jugadaRecibida3[req.NumJugador-1] = 1
 				jugadasTodoONada[req.NumJugador-1] = req.Jugada
+				RegistrarJugada(req.Jugada, req.NumJugador, req.Ronda)
 				return nil, errors.New("jugada recibida")
 			}
 		}

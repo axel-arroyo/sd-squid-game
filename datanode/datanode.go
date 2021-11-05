@@ -25,7 +25,7 @@ const (
 func playerFiles(player int32) []string {
 	var matches []string
 	var pattern = "jugador_" + strconv.Itoa(int(player)) + "*.txt"
-	err := filepath.Walk("/plays/,", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk("/home/alumno/sd-squid-game/datanode/plays/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
