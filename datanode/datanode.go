@@ -47,10 +47,11 @@ func playerFiles(player int32) []string {
 
 func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugadasReq) (*pb.ObtenerJugadasResp, error) {
 	// var jugadasPath = playerFiles(in.NumJugador)
-	var msg string
-	dat, err := ioutil.ReadFile("/home/alumno/sd-squid-game/datanode/plays/jugador_" + strconv.Itoa(int(in.NumJugador)) + "__ronda_" + strconv.Itoa(int(in.Ronda)) + ".txt")
+	var msg string = ""
+	var filename = "/home/alumno/sd-squid-game/datanode/plays/jugador_" + strconv.Itoa(int(in.NumJugador)) + "__ronda_" + strconv.Itoa(int(in.Ronda)) + ".txt"
+	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
-		msg = "No hay jugadas para el jugador " + strconv.Itoa(int(in.NumJugador)) + " en la ronda " + strconv.Itoa(int(in.Ronda))
+		log.Fatalf("failed to read %s: %v\n", filename, err)
 	} else {
 		msg = string(dat)
 	}

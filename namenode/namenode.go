@@ -41,7 +41,7 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 			// Hacer request al datanode para devolver la jugada
 			ipDatanode := strings.Split(line, " ")[2]
 			// Ver que ronda tiene el archivo de texto
-			ronda, _ := strconv.Atoi(strings.Split(line, " ")[1])
+			ronda, _ := strconv.Atoi(strings.Split(strings.Split(line, " ")[1], "_")[1])
 			connData, err := grpc.Dial(ipDatanode+portDatanode, grpc.WithInsecure())
 			if err != nil {
 				log.Fatalf("No se pudo conectar con el datanode: %v", err)
