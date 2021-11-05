@@ -109,4 +109,9 @@ func main() {
 	pb.RegisterNamenodeServer(grpcServer, &namenodeServer{})
 	log.Printf("server listening to lider at %v", liderListener.Addr())
 
+	err = grpcServer.Serve(liderListener)
+	if err != nil {
+		log.Println(err)
+	}
+
 }
