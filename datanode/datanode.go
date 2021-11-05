@@ -60,7 +60,8 @@ func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugad
 }
 
 func writePlay(jugador int32, ronda int32, jugada int32) {
-	textFile, _ := os.Create(filepath.Join("/plays/", "jugador_"+strconv.Itoa(int(jugador))+"__ronda_"+strconv.Itoa(int(ronda))+".txt"))
+	// textFile, _ := os.Create(filepath.Join("/plays/jugador_"+strconv.Itoa(int(jugador))+"__ronda_"+strconv.Itoa(int(ronda))+".txt", ))
+	textFile, _ := os.Create("/home/alumno/sd-squid-game/datanode/plays/jugador_" + strconv.Itoa(int(jugador)) + "__ronda_" + strconv.Itoa(int(ronda)) + ".txt")
 	textFile.WriteString(strconv.Itoa(int(jugada)) + "\n")
 	textFile.Close()
 	log.Printf("Escrita jugada de jugador %d", jugador)
