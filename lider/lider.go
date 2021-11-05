@@ -211,21 +211,28 @@ func DevolverJugadas(numJugador int32) {
 }
 
 func MenuJuego() {
+	// Falta caso de 0 jugadores
+	if jugadoresVivos == 0 {
+		log.Println("No hay jugadores vivos")
+		log.Println("Ingrese opción: \n 2. Mostrar las jugadas de un Jugador")
+	}
 	// Revisar si existe solo 1 jugador (terminar antes de etapa 3)
-	if jugadoresVivos <= 1 {
+	if jugadoresVivos == 1 {
 		log.Printf("El jugador %d ha ganado\n", jugadoresVivosArray[0])
 		ended = true
-		return
-	}
-	log.Printf("Ha finalizado la etapa %d\n", etapa)
-	if etapa == 2 {
-		log.Printf("Equipo1: %d 		Equipo2:%d\n", sumaEquipo1, sumaEquipo2)
-	}
-	if etapa == 3 {
-		// Terminó el juego
 		log.Println("Ingrese opción: \n 1. Mostrar los ganadores \n 2. Mostrar las jugadas de un Jugador")
+		return
 	} else {
-		log.Println("Ingrese opción: \n 1. Mostrar los jugadores vivos \n 2. Mostrar las jugadas de un Jugador \n 3. Pasar a la siguiente Etapa")
+		log.Printf("Ha finalizado la etapa %d\n", etapa)
+		if etapa == 2 {
+			log.Printf("Equipo1: %d 		Equipo2:%d\n", sumaEquipo1, sumaEquipo2)
+		}
+		if etapa == 3 {
+			// Terminó el juego
+			log.Println("Ingrese opción: \n 1. Mostrar los ganadores \n 2. Mostrar las jugadas de un Jugador")
+		} else {
+			log.Println("Ingrese opción: \n 1. Mostrar los jugadores vivos \n 2. Mostrar las jugadas de un Jugador \n 3. Pasar a la siguiente Etapa")
+		}
 	}
 	// Leer opcion
 	var opcion int32
