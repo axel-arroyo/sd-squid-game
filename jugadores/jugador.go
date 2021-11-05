@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	ipLider = "10.6.43.78"
+	// ipLider = "10.6.43.78"
+	ipLider = "localhost"
 	// Puerto del lider a donde enviar solicitudes
 	portLider = ":50052"
 )
@@ -79,9 +80,43 @@ func TirarLaCuerda(conn pb.LiderClient, bot bool, numJugador int32) bool {
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		respJugada, err = conn.EnviarJugada(ctx, &pb.EnviarJugadaReq{NumJugador: numJugador, Etapa: 2, Ronda: 1, Jugada: opcion})
+		respJugada, err = conn.EnviarJugada(ctx, &pb.EnviarJugadaReq{NumJugador: numJugador, Etapa: 2, Ronda: 5, Jugada: opcion})
 		if err != nil {
 		} else {
+			time.Sleep(1 * time.Second)
+			break
+		}
+	}
+
+	// fmt.Printf("Ha llegado respuesta al jugador %d\n", numJugador)
+	if !bot {
+		fmt.Println(respJugada.Msg)
+	}
+	return respJugada.Eliminado
+}
+
+func TodoONada(conn pb.LiderClient, bot bool, numJugador int32) bool {
+	var opcion int32
+	// Escoger un número entre 1 y 10
+	if bot {
+		opcion = rand.Int31n(10) + 1
+	} else {
+		// Jugador real, leer opción del jugador
+		fmt.Println("Ingrese un número entre 1 y 10")
+		_, err := fmt.Scanf("%d", &opcion)
+		if err != nil {
+			fmt.Println("Error leyendo input")
+		}
+	}
+	var respJugada *pb.EnviarJugadaResp
+	var err error
+	for {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		respJugada, err = conn.EnviarJugada(ctx, &pb.EnviarJugadaReq{NumJugador: numJugador, Etapa: 3, Ronda: 6, Jugada: opcion})
+		if err != nil {
+		} else {
+			time.Sleep(1 * time.Second)
 			break
 		}
 	}
@@ -155,16 +190,18 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 		fmt.Printf("El pozo acumulado es %d \n", respPozo.Valor)
 	}
 
-	// Tirar la cuerda
-
 	fmt.Println("Esperando a que el lider inice la siguiente etapa")
 	// Avisar al lider que el jugador está vivo
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		_, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 1})
+		respEstado, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 1})
 		if err != nil {
 		} else {
+			if respEstado.Msg == "¡Has ganado!" {
+				fmt.Println(respEstado.Msg)
+				return
+			}
 			break
 		}
 	}
@@ -208,10 +245,25 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 
 	fmt.Println("El lider ha comenzado la siguiente etapa.")
 	fmt.Println("Etapa 3: Todo o nada")
+	fmt.Println("Competencia en parejas: El jugador que escoja el número más cercano al lider será ganador del Juego del Calamar.")
 
-	// Todo o nada
-	return
+	eliminado = TodoONada(conn, false, numJugador)
+	if eliminado {
+		return
+	}
 
+	// Avisar que ganó, se asume que llega
+	for {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		respJugada, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 4})
+		if err != nil {
+			time.Sleep(2 * time.Second)
+		} else {
+			fmt.Println(respJugada.Msg)
+			break
+		}
+	}
 }
 
 func BotPlayer(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
@@ -286,8 +338,21 @@ func BotPlayer(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 	}
 
 	// Todo o nada
-
-	return
+	eliminado = TodoONada(conn, true, numJugador)
+	if eliminado {
+		return
+	}
+	// Avisar que ganó, se asume que llega
+	for {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_, err = conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 4})
+		if err != nil {
+			time.Sleep(2 * time.Second)
+		} else {
+			break
+		}
+	}
 
 }
 

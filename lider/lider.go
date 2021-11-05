@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"net"
 	"os"
@@ -29,32 +30,47 @@ const (
 
 // Variables Globales
 var startedStage [3]bool = [3]bool{false, false, false}
+var jugadoresVivosArray []int32 = []int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
+var playerListLock sync.Mutex
+var ganadores []int32
+
+var estadoRecibido [][]bool = [][]bool{
+	{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+	{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+	{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}}
 
 var started = false
+var ended = false
 var etapa int32 = 1
 var jugadoresVivos int32 = 16
 var jugadoresUnidos int32 = 0
 var jugadoresListos [3]int32 = [3]int32{0, 0, 0}
-var jugadaRecibida [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
 var jugadoresFinalizados [3]int32 = [3]int32{0, 0, 0}
 var menuAlreadyPrinted bool = false
 var menuLock sync.Mutex
-
-// Tirar la cuerda
-var jugadoresListosCuerda int32 = 0
 
 // estadoFinalEtapa2 -> 0: no se sabe, 1: eliminado, 2: no eliminado
 var estadoFinalEtapa2 [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 var numLuzVerde [4]int32
 var numTirarCuerda int32
 var jugadoresArray []int32
+
+// Tirar la cuerda
+var jugadaRecibida [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+var jugadoresListosCuerda int32 = 0
 var equipo1 []int32
 var equipo2 []int32
 var jugadorEliminadoTirarCuerda int32 = 0
 var sumaEquipo1 int32 = 0
 var sumaEquipo2 int32 = 0
 var eliminarEquipo1 bool = rand.Float32() < 0.5
+
+// Todo o nada
+var jugadorEliminadoTodoNada int32 = 0
+var numeroTodoONada int32 = rand.Int31n(10) + 1
+var parejas [][]int32
+var jugadasTodoONada [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+var jugadaRecibida3 [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 type liderServer struct {
 	pb.UnimplementedLiderServer
@@ -67,17 +83,14 @@ func EscogerNumerosLuzVerde() {
 	}
 }
 
-func EliminarJugadorSobrante(i int) {
-	jugadoresArray[i] = jugadoresArray[len(jugadoresArray)-1]
-	jugadoresArray = jugadoresArray[:len(jugadoresArray)-1]
-}
-
 func jugadorEnEquipo(a int32, list []int32) bool {
 	for _, b := range list {
 		if b == a {
+			// log.Printf("Revisando %d en %v retorna true\n", a, list)
 			return true
 		}
 	}
+	// log.Printf("Revisando %d en %v retorna false\n", a, list)
 	return false
 }
 
@@ -90,9 +103,27 @@ func SumarArray(array []int) int {
 }
 
 func EliminarJugador(numJugador int32) {
+	playerListLock.Lock()
 	atomic.AddInt32(&jugadoresVivos, -1)
+	// Eliminar jugador de la lista
+	for i, v := range jugadoresVivosArray {
+		if v == numJugador {
+			jugadoresVivosArray[i] = jugadoresVivosArray[len(jugadoresVivosArray)-1]
+			jugadoresVivosArray = jugadoresVivosArray[:len(jugadoresVivosArray)-1]
+			break
+		}
+	}
 	log.Printf("El jugador %d ha sido eliminado \n", numJugador)
+	playerListLock.Unlock()
 	// Request al pozo para actualizar pozo
+}
+
+func shufflePlayers() {
+	// Reordenar jugadores al azar
+	for i := 0; i < len(jugadoresVivosArray); i++ {
+		j := rand.Intn(len(jugadoresVivosArray))
+		jugadoresVivosArray[i], jugadoresVivosArray[j] = jugadoresVivosArray[j], jugadoresVivosArray[i]
+	}
 }
 
 func TirarLaCuerda() {
@@ -100,26 +131,44 @@ func TirarLaCuerda() {
 	numTirarCuerda = rand.Int31n(4) + 1
 	if jugadoresVivos%2 == 1 {
 		// Eliminar un jugador para tener paridad
-		randomIdx := rand.Intn(len(jugadoresArray))
-		jugadorEliminadoTirarCuerda = jugadoresArray[randomIdx]
-		// Avisar al jugador (?)
-		EliminarJugadorSobrante(randomIdx)
+		randomIdx := rand.Intn(len(jugadoresVivosArray))
+		jugadorEliminadoTirarCuerda = jugadoresVivosArray[randomIdx]
 		EliminarJugador(jugadorEliminadoTirarCuerda)
 	}
 	// Dividir equipos
-	equipo1 = jugadoresArray[:len(jugadoresArray)/2]
-	equipo2 = jugadoresArray[len(jugadoresArray)/2:]
+	shufflePlayers()
+	equipo1 = make([]int32, len(jugadoresVivosArray)/2)
+	equipo2 = make([]int32, len(jugadoresVivosArray)/2)
+	copy(equipo1, jugadoresVivosArray[:len(jugadoresVivosArray)/2])
+	copy(equipo2, jugadoresVivosArray[len(jugadoresVivosArray)/2:])
 	log.Printf("Equipo 1: %v	-	Equipo 2: %v\n", equipo1, equipo2)
 }
 
 func TodoONada() {
-
+	if len(jugadoresVivosArray)%2 == 1 {
+		// Eliminar un jugador para tener paridad
+		randomIdx := rand.Intn(len(jugadoresVivosArray))
+		numJugadorEliminado := jugadoresVivosArray[randomIdx]
+		EliminarJugador(numJugadorEliminado)
+		jugadorEliminadoTodoNada = numJugadorEliminado
+	}
+	// Armar parejas
+	shufflePlayers()
+	for i := 0; i < len(jugadoresVivosArray); i += 2 {
+		end := i + 2
+		if end > len(jugadoresVivosArray) {
+			end = len(jugadoresVivosArray)
+		}
+		newpareja := make([]int32, 2)
+		copy(newpareja, jugadoresVivosArray[i:end])
+		parejas = append(parejas, newpareja)
+	}
 }
 
 const (
-	siguienteEtapa = 1
-	monstrarVivos  = 2
-	jugadasJugador = 3
+	monstrarVivos  = 1
+	jugadasJugador = 2
+	siguienteEtapa = 3
 )
 
 func IniciarEtapa() {
@@ -135,16 +184,28 @@ func IniciarEtapa() {
 	case 3:
 		log.Println("Ha comenzado la etapa 3: Todo o nada")
 		TodoONada()
+		log.Printf("Las parejas son: %v\n", parejas)
 		break
 	}
 }
 
 func MenuJuego() {
+	// Revisar si existe solo 1 jugador (terminar antes de etapa 3)
+	if jugadoresVivos <= 1 {
+		log.Printf("El jugador %d ha ganado\n", jugadoresVivosArray[0])
+		ended = true
+		return
+	}
 	log.Printf("Ha finalizado la etapa %d\n", etapa)
 	if etapa == 2 {
 		log.Printf("Equipo1: %d 		Equipo2:%d\n", sumaEquipo1, sumaEquipo2)
 	}
-	log.Println("Ingrese opción: \n 1. Pasar a la siguiente Etapa \n 2. Mostrar los jugadores vivos \n 3. Mostrar las jugadas de un Jugador")
+	if etapa == 3 {
+		// Terminó el juego
+		log.Println("Ingrese opción: \n 1. Mostrar los ganadores \n 2. Mostrar las jugadas de un Jugador")
+	} else {
+		log.Println("Ingrese opción: \n 1. Mostrar los jugadores vivos \n 2. Mostrar las jugadas de un Jugador \n 3. Pasar a la siguiente Etapa")
+	}
 	// Leer opcion
 	var opcion int32
 	_, err := fmt.Scanf("%d", &opcion)
@@ -158,7 +219,7 @@ func MenuJuego() {
 		startedStage[etapa-1] = true
 		break
 	case monstrarVivos:
-		log.Println(jugadoresArray)
+		log.Println(jugadoresVivosArray)
 		MenuJuego()
 		break
 	case jugadasJugador:
@@ -219,20 +280,20 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			if jugadorEnEquipo(numJugador, equipo1) {
 				// El jugador pertenece al equipo 1, eliminarlo
 				EliminarJugador(numJugador)
-				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
+				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1)) + ". Han sido eliminados al azar (empate)"}
 			} else {
 				// El jugador es del equipo 2, no eliminarlo
 				estadoFinalEtapa2[numJugador-1] = 2
-				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2)) + ". Han pasado la etapa al azar (empate)"}
 			}
 		} else {
 			// Eliminar equipo 2
 			if jugadorEnEquipo(numJugador, equipo2) {
 				EliminarJugador(numJugador)
-				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
+				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2)) + ". Han sido eliminados al azar (empate)"}
 			} else {
 				// El jugador es del equipo 1, no eliminarlo
-				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1)) + ". Han pasado la etapa al azar (empate)"}
 			}
 		}
 	} else {
@@ -261,6 +322,52 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 	}
 }
 
+func resultTodoNada(numJugador int32) (*pb.EnviarJugadaResp, error) {
+	// Revisar error donde ambos miembros de una pareja pierden (xd)
+	var jug1 int32
+	var jug2 int32
+	var dif1 float64
+	var dif2 float64
+	for _, pareja := range parejas {
+		jug1 = pareja[0]
+		jug2 = pareja[1]
+		// Resta entre las jugadas del jugador y del lider
+		dif1 = math.Abs(float64(numeroTodoONada - jugadasTodoONada[jug1-1]))
+		dif2 = math.Abs(float64(numeroTodoONada - jugadasTodoONada[jug2-1]))
+		// El que está revisando es el jug1 (primero en la pareja)
+		if jug1 == numJugador {
+			// Caso base, los dos números son iguales, ambos ganan
+			if jugadasTodoONada[jug2-1] == jugadasTodoONada[jug1-1] {
+				ganadores = append(ganadores, numJugador)
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "Ambos jugadores ganan"}, nil
+			}
+			// Revisar quien está más cerca del número del lider
+			if dif1 < dif2 {
+				// Gana el jugador 1, pierde el jugador 2
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "¡Has ganado!"}, nil
+			} else {
+				EliminarJugador(numJugador)
+				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "Has sido eliminado"}, nil
+			}
+		}
+		// El que está revisando es el jug2 (segundo en la pareja)
+		if jug2 == numJugador {
+			// Caso base, los dos números son iguales, ambos ganan
+			if jugadasTodoONada[jug2-1] == jugadasTodoONada[jug1-1] {
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "Ambos jugadores ganan"}, nil
+			}
+			if dif1 < dif2 {
+				// Gana el jugador 1, pierde el jugador 2
+				EliminarJugador(numJugador)
+				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "Has sido eliminado"}, nil
+			} else {
+				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "¡Has ganado!"}, nil
+			}
+		}
+	}
+	return nil, errors.New("No se encontró el jugador en una pareja")
+}
+
 func RegistrarJugada(jugada int32, numJugador int32, ronda int32) {
 	// Conectar al Namenode
 	connNamenode, err := grpc.Dial(ipNamenode+portNamenode, grpc.WithInsecure())
@@ -287,7 +394,7 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 		// LuzVerdeLuzRoja
 		numLuzVerdeLuzRoja := numLuzVerde[req.Ronda-1]
 		// Registrar jugada en namenode
-		// RegistrarJugada()
+		// RegistrarJugada(req.Jugada, req.NumJugador, req.Ronda)
 		eliminado := req.Jugada >= int32(numLuzVerdeLuzRoja)
 		if eliminado {
 			EliminarJugador(req.NumJugador)
@@ -304,7 +411,7 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 		}
 		if jugadaRecibida[req.NumJugador-1] == 1 {
 			// Ya se recibió la jugada del jugador anteriormente
-			if sum(jugadaRecibida) == int32(len(jugadoresArray)) {
+			if sum(jugadaRecibida) >= int32(len(jugadoresVivosArray)) {
 				// Se recibieron todas las jugadas, calcular el resultado
 				return resultCuerda(req.NumJugador), nil
 			} else {
@@ -326,7 +433,32 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 
 	case 3:
 		// Todo o Nada
-		break
+		menuAlreadyPrinted = false
+		if req.NumJugador == jugadorEliminadoTodoNada {
+			return &pb.EnviarJugadaResp{Eliminado: true, Msg: "Has sido eliminado al azar"}, nil
+		}
+		if etapa != 3 {
+			return nil, errors.New("aún no se definen las parejas")
+		}
+		if jugadaRecibida3[req.NumJugador-1] == 1 {
+			// Ya se recibió la jugada del jugador anteriormente
+			if sum(jugadaRecibida3) >= int32(len(jugadoresVivosArray)) {
+				// Se recibieron ambas jugadas de la pareja
+				return resultTodoNada(req.NumJugador)
+			} else {
+				// Aún no se recibieron las jugadas de la pareja
+				return nil, errors.New("aún no se reciben ambas jugadas")
+			}
+		}
+		for _, pareja := range parejas {
+			if pareja[0] == req.NumJugador || pareja[1] == req.NumJugador {
+				// El jugador pertenece a la pareja
+				jugadaRecibida3[req.NumJugador-1] = 1
+				jugadasTodoONada[req.NumJugador-1] = req.Jugada
+				return nil, errors.New("jugada recibida")
+			}
+		}
+		return nil, errors.New("wtf")
 	}
 	return &pb.EnviarJugadaResp{
 		Msg: "Se ha recibido la jugada correctamente"}, nil
@@ -346,24 +478,44 @@ func printMenuOnce() bool {
 }
 
 func (s *liderServer) EnviarEstado(ctx context.Context, req *pb.EnviarEstadoReq) (*pb.EnviarEstadoResp, error) {
+	// Todos las etapas han finalizado, revisar ganadores
+	if req.Etapa == 4 {
+		if !jugadorEnEquipo(req.NumJugador, ganadores) {
+			ganadores = append(ganadores, req.NumJugador)
+		}
+		// Esperar todas las request
+		for {
+			if jugadoresVivos == int32(len(ganadores)) {
+				if printMenuOnce() {
+					MenuJuego()
+				}
+				break
+			}
+		}
+		pozo := strconv.Itoa(int(1600000000-jugadoresVivos*100000000) / (int(jugadoresVivos)))
+		return &pb.EnviarEstadoResp{
+			Msg: "Han ganado " + strconv.Itoa(int(jugadoresVivos)) + " jugadores, tu premio es de " + pozo}, nil
+	}
 	switch req.Estado {
 	case true:
-		// Caso especial req.Etapa == 2 -> Etapa 3
-		if req.Etapa == 2 {
-			// Revisar si esta en la lista de ganadoresEtapa2
-			atomic.AddInt32(&jugadoresFinalizados[req.Etapa-1], 1)
+		if ended {
+			// El juego terminó, revisar si es de los ganadores
+			if jugadorEnEquipo(req.NumJugador, jugadoresVivosArray) {
+				// Eliminarlo de la lista de jugadores vivos
+				return &pb.EnviarEstadoResp{Msg: "¡Has ganado!"}, nil
+			}
 		}
-		if jugadorEnEquipo(req.NumJugador, jugadoresArray) {
+		// Revisar si el estado ya había sido recibido
+		if estadoRecibido[req.Etapa-1][req.NumJugador-1] {
+			// Si empezó la etapa, avisarle al jugador que puede seguir
 			if startedStage[req.Etapa] {
 				return &pb.EnviarEstadoResp{Msg: "si"}, nil
 			}
 			return nil, errors.New("aún no empieza la siguiente etapa")
 		}
+
 		atomic.AddInt32(&jugadoresFinalizados[req.Etapa-1], 1)
-		// Agregar jugador a la lista de jugadores vivos para la etapa 2
-		if req.Etapa == 1 {
-			jugadoresArray = append(jugadoresArray, req.NumJugador)
-		}
+		estadoRecibido[req.Etapa-1][req.NumJugador-1] = true
 		// Esperar a que todos los jugadores estén listos
 		for {
 			if jugadoresFinalizados[req.Etapa-1] == jugadoresVivos {
