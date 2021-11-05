@@ -64,11 +64,12 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 func WriteText(ip string, ronda int32, numJugador int32) {
 	mutex.Lock()
 	// Escribir la ip del datanode con la informacion de la jugada en archivo de texto
-	textFile, _ := os.Open("info.txt")
+	textFile, _ := os.OpenFile("info.txt", os.O_APPEND|os.O_WRONLY, 0644)
 	_, err := textFile.WriteString("Jugador_" + strconv.Itoa(int(numJugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + ip + "\n")
 	if err != nil {
 		log.Fatalf("Error al escribir en el archivo: %v", err)
 	}
+	textFile.Close()
 	mutex.Unlock()
 }
 
@@ -100,7 +101,8 @@ func (s *namenodeServer) RegistrarJugada(ctx context.Context, req *pb.RegistrarJ
 
 func main() {
 	// Crear archivo de texto con las jugadas de cada jugador
-	_, _ = os.Create("info.txt")
+	textFile, _ := os.Create("info.txt")
+	textFile.Close()
 	// Escuchar al lider
 	liderListener, err := net.Listen("tcp", portServer)
 	if err != nil {

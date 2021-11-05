@@ -46,19 +46,25 @@ func getAmount() int {
 	return i
 }
 
-func writePlay(textFile os.File, jugador int32, ronda int32) {
+func writePlay(jugador int32, ronda int32) {
 	prevMont := getAmount()
+	textFile, _ := os.OpenFile("pozo.txt", os.O_APPEND|os.O_WRONLY, 0644)
 	newAmount := prevMont + 100000000
 	_, err := textFile.WriteString("Jugador_" + strconv.Itoa(int(jugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + strconv.Itoa(int(newAmount)) + "\n")
 	if err != nil {
 		log.Fatalf("Error al escribir en el archivo: %v", err)
 	}
+	textFile.Close()
 }
 
 func main() {
 	// Crear archivo de texto con las jugadas
-	textFile, err := os.Create("pozo.txt")
-	writePlay(*textFile, 1, 1)
+	textFile, _ := os.Create("pozo.txt")
+	textFile.Close()
+	// textFile.WriteString("Jugador_0 Ronda_0 0\n")
+
+	writePlay(1, 1)
+	writePlay(2, 2)
 
 	listener, err := net.Listen("tcp", portServer)
 	if err != nil {
