@@ -379,9 +379,9 @@ func RegistrarJugada(jugada int32, numJugador int32, ronda int32) {
 	for {
 		_, err = clientNamenode.RegistrarJugada(context.Background(), &pb.RegistrarJugadaReq{Jugada: jugada, NumJugador: numJugador, Ronda: ronda})
 		if err != nil {
-			break
-		} else {
 			time.Sleep(time.Second * 2)
+		} else {
+			break
 		}
 	}
 	connNamenode.Close()
