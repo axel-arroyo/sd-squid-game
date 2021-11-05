@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"path/filepath"
 	"strconv"
 
 	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
@@ -21,30 +20,6 @@ const (
 	portServer = ":50054"
 )
 
-// https://stackoverflow.com/questions/55300117/how-do-i-find-all-files-that-have-a-certain-extension-in-go-regardless-of-depth
-func playerFiles(player int32) []string {
-	var matches []string
-	var pattern = "jugador_" + strconv.Itoa(int(player)) + "__" + "*.txt"
-	err := filepath.Walk("/home/alumno/sd-squid-game/datanode/plays/", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if matched, err := filepath.Match(pattern, filepath.Base(path)); err != nil {
-			return err
-		} else if matched {
-			matches = append(matches, path)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil
-	}
-	return matches
-}
-
 func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugadasReq) (*pb.ObtenerJugadasResp, error) {
 	// var jugadasPath = playerFiles(in.NumJugador)
 	var msg string = ""
@@ -53,7 +28,7 @@ func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugad
 	if err != nil {
 		log.Fatalf("failed to read %s: %v\n", filename, err)
 	} else {
-		msg = string(dat)
+		msg = "Ronda " + strconv.Itoa(int(in.Ronda)) + ": " + string(dat)
 	}
 	return &pb.ObtenerJugadasResp{Msg: msg}, nil
 }

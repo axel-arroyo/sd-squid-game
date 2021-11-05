@@ -53,7 +53,6 @@ var menuLock sync.Mutex
 var estadoFinalEtapa2 [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 var numLuzVerde [4]int32
 var numTirarCuerda int32
-var jugadoresArray []int32
 
 // Tirar la cuerda
 var jugadaRecibida [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -176,16 +175,13 @@ func IniciarEtapa() {
 	case 1:
 		log.Println("Ha comenzado la etapa 1: Luz verde luz roja")
 		EscogerNumerosLuzVerde()
-		break
 	case 2:
 		log.Println("Ha comenzado la etapa 2: Tirar la cuerda")
 		TirarLaCuerda()
-		break
 	case 3:
 		log.Println("Ha comenzado la etapa 3: Todo o nada")
 		TodoONada()
 		log.Printf("Las parejas son: %v\n", parejas)
-		break
 	}
 }
 
@@ -205,23 +201,41 @@ func DevolverJugadas(numJugador int32) {
 	if err != nil {
 		log.Fatalf("Error en el request a namenode: %v", err)
 	} else {
-		log.Printf("Jugadas de jugador %d: %s\n", numJugador, resp.Msg)
+		log.Printf("Jugadas de jugador %d: \n%s\n", numJugador, resp.Msg)
 	}
 	conn.Close()
 }
 
+func MenuFinal() {
+	log.Println("El juego ha terminado")
+	log.Println("Ingrese opción: \n 1. Mostrar los ganadores \n 2. Mostrar las jugadas de un Jugador \n 3. Terminar")
+	var opcion int
+	fmt.Scanf("%d", &opcion)
+	switch opcion {
+	case 1:
+		log.Printf("Los ganadores son: %v\n", jugadoresVivosArray)
+		MenuFinal()
+	case 2:
+		log.Println("Ingrese el numero de jugador: (1-16)")
+		var numJugador int32
+		fmt.Scanf("%d", &numJugador)
+		DevolverJugadas(numJugador)
+		MenuFinal()
+	case 3:
+		os.Exit(0)
+	}
+}
+
 func MenuJuego() {
-	// Falta caso de 0 jugadores
 	if jugadoresVivos == 0 {
 		log.Println("No hay jugadores vivos")
-		log.Println("Ingrese opción: \n 2. Mostrar las jugadas de un Jugador")
+		log.Println("Ingrese opción: \n 2. Mostrar las jugadas de un Jugador \n 4. Terminar")
 	}
 	// Revisar si existe solo 1 jugador (terminar antes de etapa 3)
 	if jugadoresVivos == 1 {
 		log.Printf("El jugador %d ha ganado\n", jugadoresVivosArray[0])
 		ended = true
-		log.Println("Ingrese opción: \n 1. Mostrar los ganadores \n 2. Mostrar las jugadas de un Jugador")
-		return
+		MenuFinal()
 	} else {
 		log.Printf("Ha finalizado la etapa %d\n", etapa)
 		if etapa == 2 {
@@ -229,7 +243,7 @@ func MenuJuego() {
 		}
 		if etapa == 3 {
 			// Terminó el juego
-			log.Println("Ingrese opción: \n 1. Mostrar los ganadores \n 2. Mostrar las jugadas de un Jugador")
+			MenuFinal()
 		} else {
 			log.Println("Ingrese opción: \n 1. Mostrar los jugadores vivos \n 2. Mostrar las jugadas de un Jugador \n 3. Pasar a la siguiente Etapa")
 		}
@@ -245,11 +259,9 @@ func MenuJuego() {
 		atomic.AddInt32(&etapa, 1)
 		IniciarEtapa()
 		startedStage[etapa-1] = true
-		break
 	case monstrarVivos:
 		log.Println(jugadoresVivosArray)
 		MenuJuego()
-		break
 	case jugadasJugador:
 		log.Println("Ingrese el numero de jugador (1-16)")
 		_, err := fmt.Scanf("%d", &opcion)
@@ -262,7 +274,8 @@ func MenuJuego() {
 			log.Println("El numero de jugador no es valido")
 		}
 		MenuJuego()
-		break
+	case 4:
+		os.Exit(0)
 	}
 }
 
@@ -403,7 +416,7 @@ func resultTodoNada(numJugador int32) (*pb.EnviarJugadaResp, error) {
 			}
 		}
 	}
-	return nil, errors.New("No se encontró el jugador en una pareja")
+	return nil, errors.New("no se encontró el jugador en una pareja")
 }
 
 func RegistrarJugada(jugada int32, numJugador int32, ronda int32) {
