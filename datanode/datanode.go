@@ -24,7 +24,7 @@ const (
 // https://stackoverflow.com/questions/55300117/how-do-i-find-all-files-that-have-a-certain-extension-in-go-regardless-of-depth
 func playerFiles(player int32) []string {
 	var matches []string
-	var pattern = "jugador_" + strconv.Itoa(int(player)) + "*.txt"
+	var pattern = "jugador_" + strconv.Itoa(int(player)) + "__" + "*.txt"
 	err := filepath.Walk("/home/alumno/sd-squid-game/datanode/plays/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
