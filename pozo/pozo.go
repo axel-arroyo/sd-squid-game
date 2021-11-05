@@ -49,7 +49,10 @@ func getAmount() int {
 func writePlay(textFile os.File, jugador int32, ronda int32) {
 	prevMont := getAmount()
 	newAmount := prevMont + 100000000
-	textFile.WriteString("Jugador_" + strconv.Itoa(int(jugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + strconv.Itoa(int(newAmount)) + "\n")
+	_, err := textFile.WriteString("Jugador_" + strconv.Itoa(int(jugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + strconv.Itoa(int(newAmount)) + "\n")
+	if err != nil {
+		log.Fatalf("Error al escribir en el archivo: %v", err)
+	}
 }
 
 func main() {

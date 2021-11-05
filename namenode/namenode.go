@@ -72,7 +72,7 @@ func WriteText(ip string, ronda int32, numJugador int32) {
 	mutex.Unlock()
 }
 
-func (s *namenodeServer) RegistrarJugada(ctx context.Context, in *pb.RegistrarJugadaReq) (*pb.RegistrarJugadaResp, error) {
+func (s *namenodeServer) RegistrarJugada(ctx context.Context, req *pb.RegistrarJugadaReq) (*pb.RegistrarJugadaResp, error) {
 	// Escoger un datanode al azar para almacenar la jugada
 	random := rand.Intn(3)
 	ipDatanode := ipDatanodes[random]
@@ -85,7 +85,7 @@ func (s *namenodeServer) RegistrarJugada(ctx context.Context, in *pb.RegistrarJu
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
-		_, err := clientDatanode.GuardarJugada(ctx, &pb.GuardarJugadaReq{Jugada: in.Jugada, Ronda: in.Ronda, NumJugador: in.NumJugador})
+		_, err := clientDatanode.GuardarJugada(ctx, &pb.GuardarJugadaReq{Jugada: req.Jugada, Ronda: req.Ronda, NumJugador: req.NumJugador})
 		if err != nil {
 			time.Sleep(500 * time.Millisecond)
 		} else {
@@ -93,12 +93,14 @@ func (s *namenodeServer) RegistrarJugada(ctx context.Context, in *pb.RegistrarJu
 		}
 	}
 	// Almacenar la ip del datanode con la informacion de la jugada en archivo de texto
-	go WriteText(ipDatanode, in.Ronda, in.NumJugador)
+	go WriteText(ipDatanode, req.Ronda, req.NumJugador)
 	connData.Close()
 	return &pb.RegistrarJugadaResp{}, nil
 }
 
 func main() {
+	// Crear archivo de texto con las jugadas de cada jugador
+	_, _ := os.Create("info.txt")
 	// Escuchar al lider
 	liderListener, err := net.Listen("tcp", portServer)
 	if err != nil {
