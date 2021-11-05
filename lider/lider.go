@@ -394,7 +394,7 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 		// LuzVerdeLuzRoja
 		numLuzVerdeLuzRoja := numLuzVerde[req.Ronda-1]
 		// Registrar jugada en namenode
-		// RegistrarJugada(req.Jugada, req.NumJugador, req.Ronda)
+		RegistrarJugada(req.Jugada, req.NumJugador, req.Ronda)
 		eliminado := req.Jugada >= int32(numLuzVerdeLuzRoja)
 		if eliminado {
 			EliminarJugador(req.NumJugador)
