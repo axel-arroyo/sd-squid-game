@@ -189,6 +189,27 @@ func IniciarEtapa() {
 	}
 }
 
+func DevolverJugadas(numJugador int32) {
+	// Conexion con namenode
+	conn, err := grpc.Dial(ipNamenode+portNamenode, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Could not connect to namenode: %v", err)
+	}
+	clientNamenode := pb.NewNamenodeClient(conn)
+	// Enviar request
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	defer cancel()
+	resp, err := clientNamenode.DevolverJugadasJug(ctx, &pb.DevolverJugadasJugReq{
+		NumJugador: numJugador,
+	})
+	if err != nil {
+		log.Fatalf("Error en el request a namenode: %v", err)
+	} else {
+		log.Printf("Jugadas de jugador %d: %s\n", numJugador, resp.Msg)
+	}
+	conn.Close()
+}
+
 func MenuJuego() {
 	// Revisar si existe solo 1 jugador (terminar antes de etapa 3)
 	if jugadoresVivos <= 1 {
@@ -223,6 +244,16 @@ func MenuJuego() {
 		MenuJuego()
 		break
 	case jugadasJugador:
+		log.Println("Ingrese el numero de jugador (1-16)")
+		_, err := fmt.Scanf("%d", &opcion)
+		if err != nil {
+			log.Println("Error leyendo opción")
+		}
+		if opcion <= 16 && opcion >= 1 {
+			DevolverJugadas(opcion)
+		} else {
+			log.Println("El numero de jugador no es valido")
+		}
 		MenuJuego()
 		break
 	}
