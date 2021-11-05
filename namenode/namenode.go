@@ -37,7 +37,7 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 	scanner := bufio.NewScanner(textFile)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.Contains(line, "Jugador_"+strconv.Itoa(int(in.NumJugador))) {
+		if strings.Contains(line, "Jugador_"+strconv.Itoa(int(in.NumJugador))+" Ronda") {
 			// Hacer request al datanode para devolver la jugada
 			ipDatanode := strings.Split(line, " ")[2]
 			// Ver que ronda tiene el archivo de texto
