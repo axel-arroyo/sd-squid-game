@@ -15,8 +15,7 @@ import (
 )
 
 const (
-	// ipLider = "10.6.43.78"
-	ipLider = "localhost"
+	ipLider = "10.6.43.78"
 	// Puerto del lider a donde enviar solicitudes
 	portLider = ":50052"
 )
