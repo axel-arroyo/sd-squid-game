@@ -100,7 +100,7 @@ func (s *namenodeServer) RegistrarJugada(ctx context.Context, req *pb.RegistrarJ
 
 func main() {
 	// Crear archivo de texto con las jugadas de cada jugador
-	_, _ := os.Create("info.txt")
+	_, _ = os.Create("info.txt")
 	// Escuchar al lider
 	liderListener, err := net.Listen("tcp", portServer)
 	if err != nil {
