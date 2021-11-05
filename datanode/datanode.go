@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -48,16 +49,11 @@ func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugad
 	var jugadasPath = playerFiles(in.NumJugador)
 	var msg string
 	for _, jugadaPath := range jugadasPath {
-		jugadaFile, err := os.Open(jugadaPath)
-		if err != nil {
-			return nil, err
-		}
 		// Leer el archivo y devolverlo
-		dat, err := os.ReadFile(jugadaPath)
+		dat, err := ioutil.ReadFile(jugadaPath)
 		if err != nil {
 			return nil, err
 		}
-		jugadaFile.Close()
 		msg += string(dat)
 	}
 	return &pb.ObtenerJugadasResp{Msg: msg}, nil
