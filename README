@@ -1,11 +1,20 @@
-GRPC
+Integrantes:
+- Axel Arroyo Gómez             201873011-4
+- Vicente De La Rosa Sánchez    201873002-5
 
-Pozo -> dist197 -> 10.6.43.77:50051
+Configuración de máquinas
 
-Lider -> dist198 -> 10.6.43.78:50052
+dist197     -> Pozo         -> 10.6.43.77:50051
+            -> Datanode2    -> 10.6.43.77:50054
 
-Namenode -> dist199 -> 10.6.43.79:50057
+dist198     -> Datanode3    -> 10.6.43.78:50054
+            -> Lider        -> 10.6.43.78:50052
 
-Datanode1 -> dist200 -> 10.6.43.80:50054
-Datanode2 -> dist197 -> 10.6.43.77:50054
-Datanode3 -> dist198 -> 10.6.43.78:50054
+dist199     -> Namenode     -> 10.6.43.79:50057
+            -> Jugador
+
+dist200     -> Datanode1    -> 10.6.43.80:50054
+
+
+Consideraciones:
+- El pozo final se calcula en el lider (sin consultar al Pozo) puesto que sabemos la cantidad de jugadores vivos al final del juego. Esto es para evitar desincronización y asegurar que el premio que le llega al ganador es el real (asumimos que el pozo se divide equitativamente entre los ganadores en caso de haber más de uno).

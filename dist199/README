@@ -1,0 +1,7 @@
+Integrantes:
+- Axel Arroyo Gómez             201873011-4
+- Vicente De La Rosa Sánchez    201873002-5
+
+En esta máquina se ejecuta el Namenode y el Jugador.
+Se ejecutan con make run.
+Los archivos generados se eliminan con make clean según corresponda.

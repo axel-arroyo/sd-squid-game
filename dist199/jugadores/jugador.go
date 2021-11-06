@@ -25,8 +25,7 @@ func LuzVerdeLuzRoja(round int32, conn pb.LiderClient, bot bool, numJugador int3
 	if bot {
 		// Jugador bot
 		// Escoger un número al azar entre 1 y 10 y enviar la jugada
-		// opcion := rand.Int31n(10) + 1
-		opcion := rand.Int31n(2) + 5
+		opcion := rand.Int31n(10) + 1
 		respJugada, err := conn.EnviarJugada(context.Background(), &pb.EnviarJugadaReq{NumJugador: numJugador, Etapa: 1, Ronda: round, Jugada: opcion})
 		if err != nil {
 			fmt.Println(err)
