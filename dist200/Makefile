@@ -1,5 +1,6 @@
 run: 
+	mkdir ./datanode/plays
 	go run datanode/datanode.go
 
 clean:
-	rm ./datanode/plays/*.txt
+	rm -rf ./datanode/plays
