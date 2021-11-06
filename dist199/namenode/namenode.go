@@ -33,7 +33,7 @@ var (
 func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.DevolverJugadasJugReq) (*pb.DevolverJugadasJugResp, error) {
 	var msg string = ""
 	// Buscar la ip del datanode con la informacion de la jugada en archivo de texto
-	textFile, _ := os.Open("info.txt")
+	textFile, _ := os.Open("namenode/info.txt")
 	scanner := bufio.NewScanner(textFile)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -69,7 +69,7 @@ func (s *namenodeServer) DevolverJugadasJug(ctx context.Context, in *pb.Devolver
 func WriteText(ip string, ronda int32, numJugador int32) {
 	mutex.Lock()
 	// Escribir la ip del datanode con la informacion de la jugada en archivo de texto
-	textFile, _ := os.OpenFile("info.txt", os.O_APPEND|os.O_WRONLY, 0644)
+	textFile, _ := os.OpenFile("namenode/info.txt", os.O_APPEND|os.O_WRONLY, 0644)
 	_, err := textFile.WriteString("Jugador_" + strconv.Itoa(int(numJugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + ip + "\n")
 	if err != nil {
 		log.Fatalf("Error al escribir en el archivo: %v", err)
@@ -106,7 +106,7 @@ func (s *namenodeServer) RegistrarJugada(ctx context.Context, req *pb.RegistrarJ
 
 func main() {
 	// Crear archivo de texto con las jugadas de cada jugador
-	textFile, _ := os.Create("info.txt")
+	textFile, _ := os.Create("namenode/info.txt")
 	textFile.Close()
 	// Escuchar al lider
 	liderListener, err := net.Listen("tcp", portServer)
