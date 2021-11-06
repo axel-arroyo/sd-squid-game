@@ -17,6 +17,7 @@ import (
 
 	pb "github.com/axel-arroyo/sd-squid-game/gen/proto"
 
+	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 )
 
@@ -39,7 +40,6 @@ var estadoRecibido [][]bool = [][]bool{
 	{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 	{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}}
 
-var started = false
 var ended = false
 var etapa int32 = 1
 var jugadoresVivos int32 = 16
@@ -73,6 +73,45 @@ var jugadaRecibida3 [16]int32 = [16]int32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 type liderServer struct {
 	pb.UnimplementedLiderServer
+}
+
+// RabbitMQ
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
+}
+
+func avisarPozo() {
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	q, err := ch.QueueDeclare(
+		"jugadoresEliminados", // name
+		false,                 // durable
+		false,                 // delete when unused
+		false,                 // exclusive
+		false,                 // no-wait
+		nil,                   // arguments
+	)
+	failOnError(err, "Failed to declare a queue")
+
+	body := "Hello World!"
+	err = ch.Publish(
+		"",     // exchange
+		q.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        []byte(body),
+		})
+	failOnError(err, "Failed to publish a message")
 }
 
 func EscogerNumerosLuzVerde() {
@@ -292,7 +331,6 @@ func (s *liderServer) UnirseAJuego(req *pb.UnirseReq, stream pb.Lider_UnirseAJue
 	if atomic.LoadInt32(&jugadoresUnidos) == 16 {
 		log.Println("Presione cualquier tecla para iniciar el juego")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		started = true
 		startedStage[0] = true
 		IniciarEtapa()
 	}
@@ -605,6 +643,8 @@ func (s *liderServer) PedirPozo(ctx context.Context, req *pb.PedirPozoReq) (*pb.
 }
 
 func main() {
+	//Probar pozo
+	go avisarPozo()
 	// Escuchar al Jugador
 	jugadorListener, err := net.Listen("tcp", portServer)
 	if err != nil {
