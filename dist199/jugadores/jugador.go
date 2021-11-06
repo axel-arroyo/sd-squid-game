@@ -268,7 +268,7 @@ func BotPlayer(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 	defer wg.Done()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	stream, err := conn.UnirseAJuego(ctx, &pb.UnirseReq{Msg: "Quiero unirme al squirt game", NumJugador: numJugador})
+	stream, err := conn.UnirseAJuego(ctx, &pb.UnirseReq{Msg: "Quiero unirme al squid game", NumJugador: numJugador})
 	if err != nil {
 		log.Fatalf("%v.UnirseAJuego(_) = _, %v", conn, err)
 	}

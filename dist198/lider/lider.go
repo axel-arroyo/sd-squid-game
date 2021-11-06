@@ -313,7 +313,7 @@ func MenuJuego() {
 func (s *liderServer) UnirseAJuego(req *pb.UnirseReq, stream pb.Lider_UnirseAJuegoServer) error {
 	log.Println("El jugador " + strconv.Itoa(int(req.NumJugador)) + " se ha unido")
 
-	res := &pb.UnirseResp{Msg: "Te has unido al squirt game.\nEsperando a que el Líder inicie el juego."}
+	res := &pb.UnirseResp{Msg: "Te has unido al squid game.\nEsperando a que el Líder inicie el juego."}
 	err := stream.Send(res)
 	if err != nil {
 		return err

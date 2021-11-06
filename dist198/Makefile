@@ -1,4 +1,4 @@
-run: killport
+run: 
 	go run datanode/datanode.go &
 	go run lider/lider.go
 

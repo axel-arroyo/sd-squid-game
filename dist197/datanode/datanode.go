@@ -24,7 +24,7 @@ func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugad
 	path, _ := os.Getwd()
 	// var jugadasPath = playerFiles(in.NumJugador)
 	var msg string = ""
-	var filename = path + "/plays/jugador_" + strconv.Itoa(int(in.NumJugador)) + "__ronda_" + strconv.Itoa(int(in.Ronda)) + ".txt"
+	var filename = path + "/datanode/plays/jugador_" + strconv.Itoa(int(in.NumJugador)) + "__ronda_" + strconv.Itoa(int(in.Ronda)) + ".txt"
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("failed to read %s: %v\n", filename, err)
@@ -37,7 +37,7 @@ func (s *datanodeServer) ObtenerJugadas(ctx context.Context, in *pb.ObtenerJugad
 func writePlay(jugador int32, ronda int32, jugada int32) {
 	path, _ := os.Getwd()
 	// textFile, _ := os.Create(filepath.Join("/plays/jugador_"+strconv.Itoa(int(jugador))+"__ronda_"+strconv.Itoa(int(ronda))+".txt", ))
-	textFile, _ := os.Create(path + "/plays/jugador_" + strconv.Itoa(int(jugador)) + "__ronda_" + strconv.Itoa(int(ronda)) + ".txt")
+	textFile, _ := os.Create(path + "/datanode/plays/jugador_" + strconv.Itoa(int(jugador)) + "__ronda_" + strconv.Itoa(int(ronda)) + ".txt")
 	textFile.WriteString(strconv.Itoa(int(jugada)) + "\n")
 	textFile.Close()
 	// log.Printf("Escrita jugada de jugador %d", jugador)
