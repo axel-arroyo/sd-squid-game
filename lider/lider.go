@@ -83,7 +83,7 @@ func failOnError(err error, msg string) {
 }
 
 func avisarPozo() {
-	conn, err := amqp.Dial("amqp://admin:admin" + ipPozo + ":5672/")
+	conn, err := amqp.Dial("amqp://admin:admin@" + ipPozo + ":5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
