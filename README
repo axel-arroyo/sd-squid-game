@@ -15,6 +15,7 @@ dist199     -> Namenode     -> 10.6.43.79:50057
 
 dist200     -> Datanode1    -> 10.6.43.80:50054
 
-
+Instrucciones:
+Ingresar a la carpeta con el nombre de la máquina según corresponda y revisar README
 Consideraciones:
 - El pozo final se calcula en el lider (sin consultar al Pozo) puesto que sabemos la cantidad de jugadores vivos al final del juego. Esto es para evitar desincronización y asegurar que el premio que le llega al ganador es el real (asumimos que el pozo se divide equitativamente entre los ganadores en caso de haber más de uno).
