@@ -65,7 +65,7 @@ func writePlay(jugador int32, ronda int32) {
 }
 
 func rabbit() {
-	conn, err := amqp.Dial("amqp://alumno:cEuwV)8v![6B}(*a@localhost:5672/")
+	conn, err := amqp.Dial("amqp://admin:admin@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
