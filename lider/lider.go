@@ -131,8 +131,9 @@ func SumarArray(array []int) int {
 	return result
 }
 
-func EliminarJugador(numJugador int32) {
+func EliminarJugador(numJugador int32, ronda int32) {
 	playerListLock.Lock()
+	avisarPozo(numJugador, ronda)
 	atomic.AddInt32(&jugadoresVivos, -1)
 	// Eliminar jugador de la lista
 	for i, v := range jugadoresVivosArray {
@@ -162,7 +163,7 @@ func TirarLaCuerda() {
 		// Eliminar un jugador para tener paridad
 		randomIdx := rand.Intn(len(jugadoresVivosArray))
 		jugadorEliminadoTirarCuerda = jugadoresVivosArray[randomIdx]
-		EliminarJugador(jugadorEliminadoTirarCuerda)
+		EliminarJugador(jugadorEliminadoTirarCuerda, 5)
 	}
 	// Dividir equipos
 	shufflePlayers()
@@ -178,7 +179,7 @@ func TodoONada() {
 		// Eliminar un jugador para tener paridad
 		randomIdx := rand.Intn(len(jugadoresVivosArray))
 		numJugadorEliminado := jugadoresVivosArray[randomIdx]
-		EliminarJugador(numJugadorEliminado)
+		EliminarJugador(numJugadorEliminado, 6)
 		jugadorEliminadoTodoNada = numJugadorEliminado
 	}
 	// Armar parejas
@@ -359,7 +360,7 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			// Eliminar equipo 1
 			if jugadorEnEquipo(numJugador, equipo1) {
 				// El jugador pertenece al equipo 1, eliminarlo
-				EliminarJugador(numJugador)
+				EliminarJugador(numJugador, 5)
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1)) + ". Han sido eliminados al azar (empate)"}
 			} else {
 				// El jugador es del equipo 2, no eliminarlo
@@ -369,7 +370,7 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 		} else {
 			// Eliminar equipo 2
 			if jugadorEnEquipo(numJugador, equipo2) {
-				EliminarJugador(numJugador)
+				EliminarJugador(numJugador, 5)
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2)) + ". Han sido eliminados al azar (empate)"}
 			} else {
 				// El jugador es del equipo 1, no eliminarlo
@@ -383,7 +384,7 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			// Eliminar equipo 2
 			if jugadorEnEquipo(numJugador, equipo2) {
 				// El jugador pertenece al equipo 2, eliminarlo
-				EliminarJugador(numJugador)
+				EliminarJugador(numJugador, 5)
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
 			} else {
 				// El jugador pertenece al equipo 1, no eliminarlo
@@ -393,7 +394,7 @@ func resultCuerda(numJugador int32) *pb.EnviarJugadaResp {
 			// Eliminar equipo 1
 			if jugadorEnEquipo(numJugador, equipo1) {
 				// El jugador pertenece al equipo 1, eliminarlo
-				EliminarJugador(numJugador)
+				EliminarJugador(numJugador, 5)
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo1))}
 			} else {
 				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "El lider ha escogido " + strconv.Itoa(int(numTirarCuerda)) + " y tu equipo ha sumado " + strconv.Itoa(int(sumaEquipo2))}
@@ -426,7 +427,7 @@ func resultTodoNada(numJugador int32) (*pb.EnviarJugadaResp, error) {
 				// Gana el jugador 1, pierde el jugador 2
 				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "¡Has ganado!"}, nil
 			} else {
-				EliminarJugador(numJugador)
+				EliminarJugador(numJugador, 6)
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "Has sido eliminado"}, nil
 			}
 		}
@@ -438,7 +439,7 @@ func resultTodoNada(numJugador int32) (*pb.EnviarJugadaResp, error) {
 			}
 			if dif1 < dif2 {
 				// Gana el jugador 1, pierde el jugador 2
-				EliminarJugador(numJugador)
+				EliminarJugador(numJugador, 6)
 				return &pb.EnviarJugadaResp{Eliminado: true, Msg: "Has sido eliminado"}, nil
 			} else {
 				return &pb.EnviarJugadaResp{Eliminado: false, Msg: "¡Has ganado!"}, nil
@@ -477,7 +478,7 @@ func (s *liderServer) EnviarJugada(ctx context.Context, req *pb.EnviarJugadaReq)
 		RegistrarJugada(req.Jugada, req.NumJugador, req.Ronda)
 		eliminado := req.Jugada >= int32(numLuzVerdeLuzRoja)
 		if eliminado {
-			EliminarJugador(req.NumJugador)
+			EliminarJugador(req.NumJugador, req.Ronda)
 		}
 		return &pb.EnviarJugadaResp{Eliminado: eliminado, Msg: "El lider ha ingresado " + strconv.Itoa(int(numLuzVerdeLuzRoja))}, nil
 	case 2:
@@ -611,7 +612,7 @@ func (s *liderServer) EnviarEstado(ctx context.Context, req *pb.EnviarEstadoReq)
 		}
 		return &pb.EnviarEstadoResp{Msg: "si"}, nil
 	case false:
-		EliminarJugador(req.NumJugador)
+		EliminarJugador(req.NumJugador, req.Ronda)
 		return &pb.EnviarEstadoResp{Msg: "no"}, nil
 	}
 	return nil, nil
@@ -634,8 +635,6 @@ func (s *liderServer) PedirPozo(ctx context.Context, req *pb.PedirPozoReq) (*pb.
 }
 
 func main() {
-	//Probar pozo
-	go avisarPozo(1, 1)
 	// Escuchar al Jugador
 	jugadorListener, err := net.Listen("tcp", portServer)
 	if err != nil {

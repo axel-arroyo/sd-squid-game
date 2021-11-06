@@ -170,7 +170,7 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 	if suma < 21 {
 		fmt.Println("No lograste sumar 21 en las cuatro rondas. Has sido eliminado.")
 		// Avisar al lider para que actualize el pozo
-		_, _ = conn.EnviarEstado(context.Background(), &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: false, Etapa: 1})
+		_, _ = conn.EnviarEstado(context.Background(), &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: false, Etapa: 1, Ronda: 4})
 		return
 	}
 	// El jugador pasó la etapa 1
@@ -194,7 +194,7 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		respEstado, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 1})
+		respEstado, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 1, Ronda: 4})
 		if err != nil {
 		} else {
 			if respEstado.Msg == "¡Has ganado!" {
@@ -233,7 +233,7 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		_, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 2})
+		_, err := conn.EnviarEstado(ctx, &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: true, Etapa: 2, Ronda: 5})
 		if err != nil {
 			log.Println(err)
 			time.Sleep(2 * time.Second)
@@ -251,7 +251,7 @@ func Player(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 		return
 	}
 
-	// Avisar que ganó, se asume que llega
+	// Avisar que ganó
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
@@ -299,7 +299,7 @@ func BotPlayer(conn pb.LiderClient, wg *sync.WaitGroup, numJugador int32) {
 		}
 	}
 	if suma < 21 {
-		_, err = conn.EnviarEstado(context.Background(), &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: false, Etapa: 1})
+		_, err = conn.EnviarEstado(context.Background(), &pb.EnviarEstadoReq{NumJugador: numJugador, Estado: false, Etapa: 1, Ronda: 4})
 		if err != nil {
 			fmt.Println(err)
 		}

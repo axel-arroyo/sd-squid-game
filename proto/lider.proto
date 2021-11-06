@@ -26,6 +26,7 @@ message EnviarEstadoReq{
 	int32 numJugador = 1;
 	bool estado = 2;
 	int32 etapa = 3;
+	int32 ronda = 4;
 }
 
 message EnviarEstadoResp{
