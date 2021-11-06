@@ -36,7 +36,7 @@ func (s *pozoServer) Amount(ctx context.Context, req *pb.AmountReq) (*pb.AmountR
 
 func getAmount() int {
 	// Obtener ultima palabra del texto
-	file, ferr := os.Open("pozo.txt")
+	file, ferr := os.Open("pozo/pozo.txt")
 	if ferr != nil {
 		panic(ferr)
 	}
