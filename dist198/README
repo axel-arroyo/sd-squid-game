@@ -3,5 +3,6 @@ Integrantes:
 - Vicente De La Rosa Sánchez    201873002-5
 
 En esta máquina se ejecuta el Datanode3 y el Lider.
-Se ejecutan con make run
+Se ejecutan con make run.
 Los archivos generados se eliminan con make clean según corresponda.
+Asegurarse de que los puertos no están siendo utilizados por algún otro proceso.

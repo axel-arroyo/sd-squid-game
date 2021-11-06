@@ -5,3 +5,4 @@ Integrantes:
 En esta máquina se ejecuta el Pozo y el Datanode2.
 Se ejecutan con make run.
 Los archivos generados se eliminan con make clean según corresponda.
+Asegurarse de que los puertos no están siendo utilizados por algún otro proceso.

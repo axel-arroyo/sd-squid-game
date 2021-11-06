@@ -1,7 +1,4 @@
-killport:
-	fuser -k 50057/tcp
-
-run: killport
+run:
 	go run namenode/namenode.go &
 	go run jugadores/jugador.go
 
