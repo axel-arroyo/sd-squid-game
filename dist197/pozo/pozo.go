@@ -55,7 +55,7 @@ func getAmount() int {
 
 func writePlay(jugador int32, ronda int32) {
 	prevMont := getAmount()
-	textFile, _ := os.OpenFile("pozo.txt", os.O_APPEND|os.O_WRONLY, 0644)
+	textFile, _ := os.OpenFile("pozo/pozo.txt", os.O_APPEND|os.O_WRONLY, 0644)
 	newAmount := prevMont + 100000000
 	_, err := textFile.WriteString("Jugador_" + strconv.Itoa(int(jugador)) + " Ronda_" + strconv.Itoa(int(ronda)) + " " + strconv.Itoa(int(newAmount)) + "\n")
 	if err != nil {
@@ -114,7 +114,7 @@ func rabbit() {
 func main() {
 	go rabbit()
 	// Crear archivo de texto con las jugadas
-	textFile, _ := os.Create("pozo.txt")
+	textFile, _ := os.Create("pozo/pozo.txt")
 	textFile.Close()
 
 	listener, err := net.Listen("tcp", portServer)
