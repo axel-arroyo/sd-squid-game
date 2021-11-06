@@ -82,31 +82,22 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func avisarPozo() {
+func avisarPozo(numJugador int32, ronda int32) {
 	conn, err := amqp.Dial("amqp://admin:admin@" + ipPozo + ":5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	failOnError(err, "Falla en conectarse a RabbitMQ")
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		"jugadoresEliminados", // name
-		false,                 // durable
-		false,                 // delete when unused
-		false,                 // exclusive
-		false,                 // no-wait
-		nil,                   // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-
-	body := "Hello World!"
+	// El mensaje lleva el numero de jugador y la ronda separados por coma
+	body := strconv.Itoa(int(numJugador)) + "," + strconv.Itoa(int(ronda))
 	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
+		"",                    // exchange
+		"jugadoresEliminados", // routing key
+		false,                 // mandatory
+		false,                 // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(body),
@@ -644,7 +635,7 @@ func (s *liderServer) PedirPozo(ctx context.Context, req *pb.PedirPozoReq) (*pb.
 
 func main() {
 	//Probar pozo
-	go avisarPozo()
+	go avisarPozo(1, 1)
 	// Escuchar al Jugador
 	jugadorListener, err := net.Listen("tcp", portServer)
 	if err != nil {

@@ -99,10 +99,15 @@ func rabbit() {
 	go func() {
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
+			msg := strings.Split(string(d.Body), ",")
+			numJugador, ronda := msg[0], msg[1]
+			num, _ := strconv.Atoi(numJugador)
+			round, _ := strconv.Atoi(ronda)
+			writePlay(int32(num), int32(round))
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	log.Printf(" [*] Esperando notificación de jugadores eliminados.")
 	<-forever
 }
 
@@ -111,10 +116,6 @@ func main() {
 	// Crear archivo de texto con las jugadas
 	textFile, _ := os.Create("pozo.txt")
 	textFile.Close()
-	// textFile.WriteString("Jugador_0 Ronda_0 0\n")
-
-	writePlay(1, 1)
-	writePlay(2, 2)
 
 	listener, err := net.Listen("tcp", portServer)
 	if err != nil {
