@@ -18,6 +18,8 @@ dist200     -> Datanode1    -> 10.6.43.80:50054
 Instrucciones:
 Ingresar a la carpeta con el nombre de la máquina según corresponda y revisar README.
 Asegurarse de que los puertos no están siendo utilizados por algún otro proceso.
-Asegurarse de correr antes el lider.go antes que jugador.go.
+Asegurarse de hacer make clean antes de make run para eliminar archivos que ya existan.
+Ejecutar make run en la máquina del jugador (dist199) luego de realizar make run en las demás. 
 Consideraciones:
 - El pozo final se calcula en el lider (sin consultar al Pozo) puesto que sabemos la cantidad de jugadores vivos al final del juego. Esto es para evitar desincronización y asegurar que el premio que le llega al ganador es el real (asumimos que el pozo se divide equitativamente entre los ganadores en caso de haber más de uno).
+- Se asume input correcto tanto del jugador como del lider.

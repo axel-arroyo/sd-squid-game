@@ -144,6 +144,9 @@ func EliminarJugador(numJugador int32, ronda int32) {
 		}
 	}
 	log.Printf("El jugador %d ha sido eliminado \n", numJugador)
+	if jugadoresVivos == 0 {
+		go MenuJuego()
+	}
 	playerListLock.Unlock()
 	// Request al pozo para actualizar pozo
 }
